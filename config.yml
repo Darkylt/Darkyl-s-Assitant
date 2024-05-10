@@ -39,6 +39,7 @@ Random Tips Channel: 1234412833333051442
 Level Channel: 1234402356511375401
 Level Updates: False
 
+# Used for censoring the N-Word out of the Jokes API
 Censored Words: 
   - "Neger"
   - "Nigger"

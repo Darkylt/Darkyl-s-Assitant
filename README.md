@@ -49,6 +49,9 @@ Here are some of the commands supported by Darkyl's Assistant:
 
 If you encounter any issues or have any questions about Darkyl's Assistant, feel free to contact Darkyl.
 
+## Credits
+Credits go to https://heyseth.github.io for the impressive worm simulator!
+
 ## Contributing
 
 Tips for improvement are welcome :)

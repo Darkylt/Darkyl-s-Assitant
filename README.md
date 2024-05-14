@@ -1,6 +1,6 @@
 # Darkyl's Assistant Discord Bot
 
-Darkyl's Assistant is a private Discord bot created by Darkyl for his server. Found here[https://discord.gg/m4Hc9dM8qS]
+Darkyl's Assistant is a private Discord bot created by Darkyl for his server. Found here: https://discord.gg/m4Hc9dM8qS
 
 Built using Hikari, Lightbulb and Miru
 

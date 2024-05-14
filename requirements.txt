@@ -9,3 +9,4 @@ google-api-python-client==2.127.0
 schedule==1.2.1
 nekos.py==1.1.0
 selenium==4.20.0
+webdriver-manager==4.0.1

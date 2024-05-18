@@ -26,75 +26,74 @@ except yaml.YAMLError:
 
 class Bot:
     token = secret["Bot Token"]
-    server = config["Server ID"]
+    server = config["Server"]["server_id"]
     root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     logs_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "logs")
     data_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "Data")
     assets_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "Assets")
-    darkyl_id = config["Darkyl User ID"]
-    verified_role = config["Verified Role"]
-    logs_channel = config["Logs Channel"]
-    random_tips = config["Random Tips Enabled"]
-    random_tips_channel = config["Random Tips Channel"]
-    admin_role = config["Admin Role"]
-    mod_role = config["Moderator Role"]
-    report_channel = config["Reports Channel"]
-    censored_words = config["Censored Words"]
-    level_update_channel = config["Level Channel"]
-    level_updates_enabled = config["Level Updates"]
+    darkyl_id = config["Owner"]["darkyl_id"]
+    verified_role = config["Roles"]["verified"]
+    logs_channel = config["Channels"]["logs"]
+    random_tips = config["Random Tips"]["enabled"]
+    random_tips_channel = config["Random Tips"]["channel"]
+    admin_role = config["Roles"]["admin"]
+    mod_role = config["Roles"]["moderator"]
+    report_channel = config["Channels"]["reports"]
+    censored_roast_words = config["Moderation"]["roast_api_censored_words"]
+    level_update_channel = config["Level System"]["update_channel"]
+    level_updates_enabled = config["Level System"]["update_levels"]
     worm_is_running = False
-    
 
 class Join:
     overlay_path = os.path.join(Bot.assets_folder, "Welcome Image.png")
-    channel = config["Welcome Channel"]
-    welcome_card_scale_factor = config["Scale Factor"]
+    channel = config["Welcome Card"]["channel"]
+    welcome_card_scale_factor = config["Welcome Card"]["scale_factor"]
 
 class ReactionRoles:
-    gamer_role = config["Gamer Role"]
-    musician_role = config["Musician Role"]
-    dj_role = config["DJ Role"]
-    photographer_role = config["Photographer Role"]
-    content_creator_role = config["Content Creator Role"]
-    visual_artist_role = config["Visual Artist Role"]
-    he_him_role = config["he/him Role"]
-    she_her_role = config["she/her Role"]
-    they_them_role = config["they/them Role"]
-    other_ask_role = config["other (ask) Role"]
-    north_america_role = config["North America Role"]
-    south_america_role = config["South America Role"]
-    europe_role = config["Europe Role"]
-    asia_role = config["Asia Role"]
-    africa_role = config["Africa Role"]
-    oceania_australia_role = config["Oceania/Australia Role"]
-    skibidy_toilet_role = config["Skibidy Toilet Role"]
-    youtube_ping_role = config["YouTube Ping Role"]
+    gamer_role = config["Roles"]["Descriptors"]["gamer"]
+    musician_role = config["Roles"]["Descriptors"]["musician"]
+    dj_role = config["Roles"]["Descriptors"]["dj"]
+    photographer_role = config["Roles"]["Descriptors"]["photographer"]
+    content_creator_role = config["Roles"]["Descriptors"]["content_creator"]
+    visual_artist_role = config["Roles"]["Descriptors"]["visual_artist"]
+    he_him_role = config["Roles"]["Pronouns"]["he_him"]
+    she_her_role = config["Roles"]["Pronouns"]["she_her"]
+    they_them_role = config["Roles"]["Pronouns"]["they_them"]
+    other_ask_role = config["Roles"]["Pronouns"]["other_ask"]
+    north_america_role = config["Roles"]["Regions"]["north_america"]
+    south_america_role = config["Roles"]["Regions"]["south_america"]
+    europe_role = config["Roles"]["Regions"]["europe"]
+    asia_role = config["Roles"]["Regions"]["asia"]
+    africa_role = config["Roles"]["Regions"]["africa"]
+    oceania_australia_role = config["Roles"]["Regions"]["oceania_australia"]
+    skibidy_toilet_role = config["Roles"]["Pronouns"]["skibidy_toilet"]
+    youtube_ping_role = config["Roles"]["Pings"]["youtube"]
 
 class YouTube:
-    ping_role = config["YouTube Ping Role"]
+    ping_role = config["Roles"]["Pings"]["youtube"]
     api_key = secret["YouTube API Key"]
-    channel = config["YouTube Channel"]
+    channel = config["YouTube"]["channel_id"]
     last_uploaded_video_file = os.path.join(Bot.data_folder, "last_uploaded_video.txt")
-    provided_check_frequency = config["YouTube Check Frequency"]
+    provided_check_frequency = config["YouTube"]["check_frequency"]
     check_frequency = 3600
-    discord_channel = config["YouTube Discord Channel"]
+    discord_channel = config["YouTube"]["discord_channel"]
 
 class HelpMessage:
-    message = config["Help Message"]
-    message_all = config["Help Message All commands"]
-    message_all_admin = config["Help Message Admin commands"]
-    message_fun = config["Help Message Fun commands"]
-    message_utility = config["Help Message Utility commands"]
+    message = config["Help Messages"]["general"]
+    message_all = config["Help Messages"]["all_commands"]
+    message_all_admin = config["Help Messages"]["admin_commands"]
+    message_fun = config["Help Messages"]["fun_commands"]
+    message_utility = config["Help Messages"]["utility_commands"]
     rules = config["Rules Discord"]
     rules_vc =  config["Rules VC"]
     scam_message = config["Scams"]
 
 class AutoMod:
-    filter_nsfw_language = config["Filter NSFW Words"]
-    allowed_files = config["Allowed Files"]
+    filter_nsfw_language = config["Moderation"]["filter_nsfw_words"]
+    allowed_files = config["Moderation"]["allowed_files"]
 
 class Level:
-    leve_from_xp_mapping = config["Level From XP"]
+    leve_from_xp_mapping = config["Level System"]["level_xp_mapping"]
 
 class Stats:
     api_key = secret["Tracker.gg API Key"]
@@ -108,60 +107,68 @@ def validate():
     """ # Note: Add other validation checks later
 
     required_keys = {
-        "Server ID": int,
-        "Darkyl User ID": int,
-        "Logs Channel": int,
-        "Welcome Channel": int,
-        "Scale Factor": float,
-        "Verified Role": int,
-        "Gamer Role": int,
-        "Musician Role": int,
-        "DJ Role": int,
-        "Photographer Role": int,
-        "Content Creator Role": int,
-        "Visual Artist Role": int,
-        "he/him Role": int,
-        "she/her Role": int,
-        "they/them Role": int,
-        "other (ask) Role": int,
-        "North America Role": int,
-        "South America Role": int,
-        "Europe Role": int,
-        "Asia Role": int,
-        "Africa Role": int,
-        "Oceania/Australia Role": int,
-        "Skibidy Toilet Role": int,
-        "YouTube Ping Role": int,
-        "YouTube Discord Channel": int,
-        "YouTube Channel": str,
-        "YouTube Check Frequency": int,
-        "Random Tips Enabled": bool,
-        "Random Tips Channel": int,
-        "Admin Role": int,
-        "Reports Channel": int,
-        "Help Message": str,
-        "Help Message All commands": str,
-        "Help Message Admin commands": str,
-        "Help Message Fun commands": str,
-        "Moderator Role": int,
-        "Censored Words": list,
-        "Level From XP": dict,
-        "Level Channel": int,
-        "Level Updates": bool,
-        "Filter NSFW Words": bool,
-        "Allowed Files": list
+        "Server.server_id": int,
+        "Owner.darkyl_id": int,
+        "Channels.logs": int,
+        "Channels.reports": int,
+        "Welcome Card.scale_factor": float,
+        "Welcome Card.channel": int,
+        "Roles.admin": int,
+        "Roles.moderator": int,
+        "Roles.verified": int,
+        "Roles.Descriptors.gamer": int,
+        "Roles.Descriptors.musician": int,
+        "Roles.Descriptors.dj": int,
+        "Roles.Descriptors.photographer": int,
+        "Roles.Descriptors.content_creator": int,
+        "Roles.Descriptors.visual_artist": int,
+        "Roles.Pronouns.he_him": int,
+        "Roles.Pronouns.she_her": int,
+        "Roles.Pronouns.they_them": int,
+        "Roles.Pronouns.other_ask": int,
+        "Roles.Pronouns.skibidy_toilet": int,
+        "Roles.Regions.north_america": int,
+        "Roles.Regions.south_america": int,
+        "Roles.Regions.europe": int,
+        "Roles.Regions.africa": int,
+        "Roles.Regions.asia": int,
+        "Roles.Regions.oceania_australia": int,
+        "Roles.Pings.youtube": int,
+        "YouTube.channel_id": str,
+        "YouTube.check_frequency": int,
+        "YouTube.discord_channel": int,
+        "Random Tips.enabled": bool,
+        "Random Tips.channel": int,
+        "Level System.update_levels": bool,
+        "Level System.update_channel": int,
+        "Level System.level_xp_mapping": dict,
+        "Moderation.allowed_files": list,
+        "Moderation.filter_nsfw_words": bool,
+        "Moderation.roast_api_censored_words": list,
+        "Help Messages.general": str,
+        "Help Messages.all_commands": str,
+        "Help Messages.admin_commands": str,
+        "Help Messages.fun_commands": str,
+        "Help Messages.utility_commands": str
     }
 
+    def get_nested_key(d, keys):
+            for key in keys.split('.'):
+                if key in d:
+                    d = d[key]
+                else:
+                    raise InvalidConfigError(f"Key '{keys}' in config.yml is missing.")
+            return d
+
     for key, expected_type in required_keys.items():
-        if key not in config:
-            raise InvalidConfigError(f"Key '{key}' in config.yml is missing.")
+        value = get_nested_key(config, key)
         if isinstance(expected_type, tuple):
             expected_types = [t.__name__ for t in expected_type]
             expected_types_str = " or ".join(expected_types)
-            if not any(isinstance(config[key], t) for t in expected_type):
+            if not any(isinstance(value, t) for t in expected_type):
                 raise InvalidConfigError(f"Key '{key}' in config.yml is supposed to be {expected_types_str}.")
         else:
-            if not isinstance(config[key], expected_type):
+            if not isinstance(value, expected_type):
                 raise InvalidConfigError(f"Key '{key}' in config.yml is supposed to be a {expected_type.__name__}.")
 
     YouTube.check_frequency = YouTube.provided_check_frequency

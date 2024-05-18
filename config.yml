@@ -1,317 +1,277 @@
-Server ID: 
-Darkyl User ID: 
+Server:
+  server_id:
 
-Logs Channel: 
-Reports Channel: 
+Owner:
+  darkyl_id:
 
-Welcome Channel: 
-Scale Factor: 0.74 # By how much the profile picture is resized in the welcome card
+Channels:
+  logs:
+  reports:
 
-Admin Role: 
-Moderator Role: 
-Verified Role: 
-Gamer Role: 
-Musician Role: 
-DJ Role: 
-Photographer Role: 
-Content Creator Role: 
-Visual Artist Role: 
-he/him Role: 
-she/her Role: 
-they/them Role: 
-other (ask) Role: 
-North America Role: 
-South America Role: 
-Europe Role: 
-Asia Role: 
-Africa Role: 
-Oceania/Australia Role: 
-Skibidy Toilet Role: 
-YouTube Ping Role: 
+Welcome Card:
+  scale_factor: 0.74
+  channel:
 
-YouTube Discord Channel: 
-YouTube Channel:  #Channel ID of the YouTube channel
-YouTube Check Frequency: 1200 # How often it should check for a new video in seconds
+Roles:
+  admin:
+  moderator:
+  verified:
+  Descriptors:
+    gamer:
+    musician:
+    dj:
+    photographer:
+    content_creator:
+    visual_artist:
+  Pronouns:
+    he_him:
+    she_her:
+    they_them:
+    other_ask:
+    skibidy_toilet:
+  Regions:
+    north_america:
+    south_america:
+    europe:
+    asia:
+    africa:
+    oceania_australia:
+  Pings:
+    youtube:
 
-Random Tips Enabled: False
-Random Tips Channel: 
+YouTube:
+  channel_id:
+  check_frequency: 1200 # How often it should check for a new video (in seconds)
+  discord_channel:
 
-Level Channel: 
-Level Updates: False
+Random Tips:
+  enabled: False
+  channel:
 
-Allowed Files:
-  - "png"
-  - "jpg"
-  - "jpeg"
-  - "gif"
-  - "bmpg"
-  - "tiff"
-  - "tif"
-  - "svg"
-  - "pdf"
-  - "doc"
-  - "xls"
-  - "ppt"
-  - "odt"
-  - "ods"
-  - "odp"
-  - "txt"
-  - "rtf"
-  - "mp3"
-  - "wav"
-  - "ogg"
-  - "flac"
-  - "aac"
-  - "mp4"
-  - "mov"
-  - "avi"
-  - "mkv"
-  - "wmv"
-  - "ttf"
-  - "otf"
+Level System:
+  update_levels: False
+  update_channel:
+  level_xp_mapping:
+    1: 155
+    2: 220
+    3: 295
+    4: 380
+    5: 475
+    6: 580
+    7: 695
+    8: 820
+    9: 955
+    10: 1100
+    11: 1255
+    12: 1420
+    13: 1595
+    14: 1780
+    15: 1975
+    16: 2180
+    17: 2395
+    18: 2620
+    19: 2855
+    20: 3100
+    21: 3355
+    22: 3620
+    23: 3895
+    24: 4180
+    25: 4475
+    26: 4780
+    27: 5095
+    28: 5420
+    29: 5755
+    30: 6100
+    31: 6455
+    32: 6820
+    33: 7195
+    34: 7580
+    35: 7975
+    36: 8380
+    37: 8795
+    38: 9220
+    39: 9655
+    40: 10100
+    41: 10555
+    42: 11020
+    43: 11395
+    44: 11980
+    45: 12475
+    46: 12980
+    47: 13495
+    48: 14020
+    49: 14555
+    50: 15100
+    51: 15655
+    52: 16220
+    53: 16795
+    54: 17380
+    55: 17975
+    56: 18580
+    57: 19195
+    58: 19820
+    59: 20455
+    60: 21100
+    61: 21755
+    62: 22420
+    63: 23095
+    64: 23780
+    65: 24475
+    66: 25180
+    67: 25895
+    68: 26620
+    69: 27355
+    70: 28100
+    71: 28855
+    72: 29620
+    73: 30395
+    74: 31180
+    75: 31975
+    76: 32780
+    77: 33595
+    78: 34420
+    79: 35255
+    80: 36100
+    81: 36955
+    82: 37820
+    83: 38695
+    84: 39580
+    85: 40475
+    86: 41380
+    87: 42295
+    88: 43220
+    89: 44155
+    90: 45100
+    91: 46055
+    92: 47020
+    93: 47995
+    94: 48980
+    95: 49975
+    96: 50980
+    97: 51995
+    98: 53020
+    99: 54055
+    100: 55100
 
-Filter NSFW Words: False
+Moderation:
+  #Filtering
+  allowed_files:
+    - "png"
+    - "jpg"
+    - "jpeg"
+    - "gif"
+    - "bmpg"
+    - "tiff"
+    - "tif"
+    - "svg"
+    - "pdf"
+    - "doc"
+    - "xls"
+    - "ppt"
+    - "odt"
+    - "ods"
+    - "odp"
+    - "txt"
+    - "rtf"
+    - "mp3"
+    - "wav"
+    - "ogg"
+    - "flac"
+    - "aac"
+    - "mp4"
+    - "mov"
+    - "avi"
+    - "mkv"
+    - "wmv"
+    - "ttf"
+    - "otf"
+  filter_nsfw_words: False
+  
+  roast_api_censored_words: # Used for censoring specific words out of the insult API
+    - "Neger"
+    - "Nigger"
+    - "neger"
+    - "nigger"
 
-# Used for censoring the N-Word out of the Jokes API
-Censored Words: 
-  - "Neger"
-  - "Nigger"
-  - "neger"
-  - "nigger"
+Help Messages:
+  general: |
+    Hello! I'm Darkyl's Assitant!
+    I'm your digital overlord, here to save the day!
+    From keeping the peace to sprinkling a little fun, I've got it covered!
+    *And yes, despite all the hard work, I'm sadly unpaid* 😔
 
-Help Message: |
-  Hello! I'm Darkyl's Assitant!
-  I'm your digital overlord, here to save the day!
-  From keeping the peace to sprinkling a little fun, I've got it covered!
-  *And yes, despite all the hard work, I'm sadly unpaid* 😔
+    You can use the category option of this command to learn more about what I have to offer!
+  
+  all_commands: |
+    **/help:** Get help with the bot.
+    **/report:** Report a user to the mods.
+    **/socials:** Get links to all of Darkyl's profiles.
+    **/stats:** Get statistics on me!
+    **/cat:** Send a cat gif :)
+    **/dog:** Send a dog gif :)
+    **/hug:** Hug someone :)
+    **/kiss:** Kiss someone :)
+    **/slap:** Slap someone 😈
+    **/roast:** Roast someone!
+    **/advice:** Let me give you some useful advice!
+    **/joke:** Let me tell you a joke!
+    **/why:** Askin' the real questions here
+    **/pop:** Occupational therapy
+    **/ship:** Ship somebody with someone else!
+    **quote:** (Message command): Generate a quote card
+    **mock:** (Message command): iTS SpElleD sQl!!
+    **/8ball:** Ask a question to the 8Ball!
+    **/converter_binary:** Convert to or from binary
+    **/converter_base64:** Convert to or from base64
+    **/show_avatar:** Display someones avatar
+    **/wiki:** Search Wikipedia for articles!
+    **/f:** Press F to pay respect.
+    **/rickroll:** You have been rickrolled (Also: /rickroll)
+  
+  admin_commands: |
+    **/admin_tst:** A command used for testing the bot.
+    **/admin_stop:** Stop the Bot.
+    **/admin_restart:** Restart the Bot.
+    **/admin_add_tip:** Adds a tip to the daily random tips.
+    **/admin_send_tip:** Triggers sending the daily random tip.
+    **/warn:** Warn a user.
+    **/clear_warnings:** Remove all warnings of someone.
+    **/kick:** Kick a user.
+    **/ban:** Ban a user.
+    **/slowmode:** Set the slowmode interval for a channel.
+    **/timeout:** Timeout a member.
+    **/purge:** Purge messages from this channel. (Also: /clear, /prune)
+    **/mod_menu:** Your control panel for a user
 
-  You can use the category option of this command to learn more about what I have to offer!
+  fun_commands: |
+    Some commands to have a little fun. Spice up the server or do a little trolling 😈.
+    **/stats:** Get statistics on me!
+    **/cat:** Send a cat gif :)
+    **/dog:** Send a dog gif :)
+    **/hug:** Hug someone :)
+    **/kiss:** Kiss someone :)
+    **/slap:** Slap someone 😈
+    **/roast:** Roast someone!
+    **/advice:** Let me give you some useful advice!
+    **/joke:** Let me tell you a joke!
+    **/why:** Askin' the real questions here
+    **/pop:** Occupational therapy
+    **/ship:** Ship somebody with someone else!
+    **quote:** (Message command): Generate a quote card
+    **mock:** (Message command): iTS SpElleD sQl!!
+    **/f:** Press F to pay respect.
+    **/rickroll:** You have been rickrolled (Also: /rickroll)
+    **/8ball:** Ask a question to the 8Ball!
 
-Help Message All commands: |
-  **/help:** Get help with the bot.
-  **/report:** Report a user to the mods.
-  **/socials:** Get links to all of Darkyl's profiles.
-  **/stats:** Get statistics on me!
-  **/cat:** Send a cat gif :)
-  **/dog:** Send a dog gif :)
-  **/hug:** Hug someone :)
-  **/kiss:** Kiss someone :)
-  **/slap:** Slap someone 😈
-  **/roast:** Roast someone!
-  **/advice:** Let me give you some useful advice!
-  **/joke:** Let me tell you a joke!
-  **/why:** Askin' the real questions here
-  **/pop:** Occupational therapy
-  **/ship:** Ship somebody with someone else!
-  **quote:** (Message command): Generate a quote card
-  **mock:** (Message command): iTS SpElleD sQl!!
-  **/8ball:** Ask a question to the 8Ball!
-  **/converter_binary:** Convert to or from binary
-  **/converter_base64:** Convert to or from base64
-  **/show_avatar:** Display someones avatar
-  **/wiki:** Search Wikipedia for articles!
-  **/f:** Press F to pay respect.
-  **/rickroll:** You have been rickrolled (Also: /rickroll)
+  utility_commands: |
+    Some useful commands.
+    **/converter_binary:** Convert to or from binary
+    **/converter_base64:** Convert to or from base64
+    **/show_avatar:** Display someones avatar
+    **/wiki:** Search Wikipedia for articles!
 
-Help Message Admin commands: |
-  **/admin_tst:** A command used for testing the bot.
-  **/admin_stop:** Stop the Bot.
-  **/admin_restart:** Restart the Bot.
-  **/admin_add_tip:** Adds a tip to the daily random tips.
-  **/admin_send_tip:** Triggers sending the daily random tip.
-  **/warn:** Warn a user.
-  **/clear_warnings:** Remove all warnings of someone.
-  **/kick:** Kick a user.
-  **/ban:** Ban a user.
-  **/slowmode:** Set the slowmode interval for a channel.
-  **/timeout:** Timeout a member.
-  **/purge:** Purge messages from this channel. (Also: /clear, /prune)
-  **/mod_menu:** Your control panel for a user
-
-Help Message Fun commands: |
-  Some commands to have a little fun. Spice up the server or do a little trolling 😈.
-  **/stats:** Get statistics on me!
-  **/cat:** Send a cat gif :)
-  **/dog:** Send a dog gif :)
-  **/hug:** Hug someone :)
-  **/kiss:** Kiss someone :)
-  **/slap:** Slap someone 😈
-  **/roast:** Roast someone!
-  **/advice:** Let me give you some useful advice!
-  **/joke:** Let me tell you a joke!
-  **/why:** Askin' the real questions here
-  **/pop:** Occupational therapy
-  **/ship:** Ship somebody with someone else!
-  **quote:** (Message command): Generate a quote card
-  **mock:** (Message command): iTS SpElleD sQl!!
-  **/f:** Press F to pay respect.
-  **/rickroll:** You have been rickrolled (Also: /rickroll)
-  **/8ball:** Ask a question to the 8Ball!
-
-Help Message Utility commands: |
-  Some useful commands.
-  **/converter_binary:** Convert to or from binary
-  **/converter_base64:** Convert to or from base64
-  **/show_avatar:** Display someones avatar
-  **/wiki:** Search Wikipedia for articles!
-
-Level From XP:
-  1: 155
-  2: 220
-  3: 295
-  4: 380
-  5: 475
-  6: 580
-  7: 695
-  8: 820
-  9: 955
-  10: 1100
-  11: 1255
-  12: 1420
-  13: 1595
-  14: 1780
-  15: 1975
-  16: 2180
-  17: 2395
-  18: 2620
-  19: 2855
-  20: 3100
-  21: 3355
-  22: 3620
-  23: 3895
-  24: 4180
-  25: 4475
-  26: 4780
-  27: 5095
-  28: 5420
-  29: 5755
-  30: 6100
-  31: 6455
-  32: 6820
-  33: 7195
-  34: 7580
-  35: 7975
-  36: 8380
-  37: 8795
-  38: 9220
-  39: 9655
-  40: 10100
-  41: 10555
-  42: 11020
-  43: 11395
-  44: 11980
-  45: 12475
-  46: 12980
-  47: 13495
-  48: 14020
-  49: 14555
-  50: 15100
-  51: 15655
-  52: 16220
-  53: 16795
-  54: 17380
-  55: 17975
-  56: 18580
-  57: 19195
-  58: 19820
-  59: 20455
-  60: 21100
-  61: 21755
-  62: 22420
-  63: 23095
-  64: 23780
-  65: 24475
-  66: 25180
-  67: 25895
-  68: 26620
-  69: 27355
-  70: 28100
-  71: 28855
-  72: 29620
-  73: 30395
-  74: 31180
-  75: 31975
-  76: 32780
-  77: 33595
-  78: 34420
-  79: 35255
-  80: 36100
-  81: 36955
-  82: 37820
-  83: 38695
-  84: 39580
-  85: 40475
-  86: 41380
-  87: 42295
-  88: 43220
-  89: 44155
-  90: 45100
-  91: 46055
-  92: 47020
-  93: 47995
-  94: 48980
-  95: 49975
-  96: 50980
-  97: 51995
-  98: 53020
-  99: 54055
-  100: 55100
-
-# I'll keep these in here for later use maybe
+# Unused Sections
 # Make sure to add them to the config validation if you decide to use these
 Rules Discord: |
-  1. **Be respectful** ✨
-
-  2. No spamming or flooding 🚫
-
-  3. Keep it PG-13 outside of channels specifically marked as NSFW 🔞
-
-  4. Self promote only in <#1234414335996989530> 📣
-
-  5. Respect privacy (Don't share personal info of yourself or others. **All Messages will be saved.**) 🤐
-
-  6. Listen to moderators 👂
-
-  7. Report violations ⚠️
-
-  7. Avatars, nicknames and descriptions must not contain any pornographic, racist or offensive content and must consist of the Latin alphabet.
-
-  9. Admins or mods can add or change the rules at any time
-
-  10. We follow the **Discord TOS and Guidelines**
-
 Rules VC: |
-   1. Do not intentionally play loud, high-pitched or annoying tones! 🔊🚫
-
-   2. Avoid illegal topics 🚫📝
-
-   3. Do not use text-to-speech use the inbuilt Chat in Voice Channels 💬🚫
-
-   4. Avoid background noise such as vacuum cleaner, radio, television, etc. 🔇🚫
-
 Scams: |
-  Links may be hidden behinds other links. Verify through the pop up box that the link in chat matches the one in the pop up.
-
-  Here's a list of legit ways:
-  - Nitro gifts are `discord.gift`
-  - Discord staff always have a `Discord Staff` badge on their profile.
-  - Free gifts from Discord will be in your `Gift Inventory` undr `User Settings`.
-  - DMs from Discord are sent through an account with a `✔️ SYSTEM` next to their name, not bots.
-
-  Here are some of the scams we're aware of and ways to deal with them:
-  - A bot, sometimes even verified, sends you a legit-looking Nitro gift link in an embed, it hides a phishing link → Do not click on the link.
-  - Someone is running a giveaway of any sort → Make sure the user has a giveaway role
-  - Someone asks you to test their new game → Don't download the game.
-  - Someone tells you they reported your Steam account → Do not engage.
-  - Someone sends you a Steam trading link → Don't click it, go on Steam instead.
-  - Someone sent an image that doesn't seem to load → Don't open the image in your browser, check your internet connection and reload Discord, if it still doesn't load it's a scam.
-  - Someone is claiming you're being outed on a server for doing something bad that you know didn't happen → Do not join the server
-  - Do not Scan QR Codes
-  - Do not open images in your browser
-  - Do not download untrusted files
-
-  Enable 2FA if possible under `User Settings → My Account`.
-  Leave servers that you are not active in.
-  Under `User Settings → Privacy & Safety → Server Privacy Defaults` disable `Allow direct messages from server members`
-
-  Check out Discords Guide on `TIPS AGAINST SPAM AND HACKING` 👇

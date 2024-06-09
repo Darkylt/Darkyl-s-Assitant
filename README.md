@@ -46,6 +46,19 @@ Here are some of the commands supported by Darkyl's Assistant:
 -  **/slowmode:** Set the slowmode interval for a channel.
 -  **/timeout:** Timeout a member.
 -  **/purge:** Purge messages from this channel. (Also: /clear, /prune)
+-  **/mod_menu:** Your control panel for a user
+-  **/show_avatar:** Display someones avatar
+-  **/wiki:** Search Wikipedia for articles!
+-  **/f:** Press F to pay respect.
+-  **/rickroll:** You have been rickrolled
+-  **/nsfw_opt_out:** Choose not to be included in NSFW contexts by the bot
+-  **/rock_paper_scissors:** Play Rock Paper Scissors
+-  **/time_in:** Get the time
+-  **/truth_or_dare:** Get a truth or dare question.
+-  **/would_you_rather:** Get a would you rather question.
+-  **/pi_search:** Search for a number in pi.
+-  **/pi_fact:** Get a random fact about pi.
+-  **/pi_segment:** Get a segment of pi with stats about it.
 
 ## Support
 

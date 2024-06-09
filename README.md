@@ -69,5 +69,4 @@ Credits go to https://heyseth.github.io for the impressive worm simulator!
 
 ## Contributing
 
-Tips for improvement are welcome :)
-i'm currently trying to get Plugins/Extensions to work but I'm facing issues with that
+Tips for improvement are very welcome :)

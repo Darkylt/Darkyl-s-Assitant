@@ -117,7 +117,7 @@ def get_segment_statistic(segment: int, total_digits: int):
 @plugin.command
 @lightbulb.option("start", "Where should the segment start", type=int, required=True, max_value=(PI_LENGTH-1), min_value=1)
 @lightbulb.option("length", "The length of the segment", type=int, required=True, max_value=1500, min_value=1)
-@lightbulb.command("pi_segment", "Get a segment of pi.", pass_options=True)
+@lightbulb.command("pi_segment", "Get a segment of pi with stats about it.", pass_options=True)
 @lightbulb.implements(lightbulb.commands.SlashCommand)
 async def pi_segment_command(ctx: lightbulb.context.SlashContext, start, length) -> None:
     if not await utils.validate_command(ctx):

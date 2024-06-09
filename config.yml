@@ -250,6 +250,9 @@ Help Messages:
     **/time_in:** Get the time
     **/truth_or_dare:** Get a truth or dare question.
     **/would_you_rather:** Get a would you rather question.
+    **/pi_search:** Search for a number in pi.
+    **/pi_fact:** Get a random fact about pi.
+    **/pi_segment:** Get a segment of pi with stats about it.
   
   admin_commands: |
     **/admin_tst:** A command used for testing the bot.
@@ -288,6 +291,9 @@ Help Messages:
     **/rock_paper_scissors:** Play Rock Paper Scissors
     **/truth_or_dare:** Get a truth or dare question.
     **/would_you_rather:** Get a would you rather question.
+    **/pi_search:** Search for a number in pi.
+    **/pi_fact:** Get a random fact about pi.
+    **/pi_segment:** Get a segment of pi with stats about it.
 
   utility_commands: |
     Some useful commands.

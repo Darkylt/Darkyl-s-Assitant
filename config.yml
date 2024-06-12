@@ -1,58 +1,58 @@
 Server:
-  server_id: 719633317422432366
+  server_id:
 
 Owner:
-  darkyl_id: 671019102583783434
+  darkyl_id:
 
 Channels:
-  logs: 1234402356511375401
-  reports: 1234402392808624128
-  admin: 739033247165579274
+  logs:
+  reports:
+  admin:
 
 Welcome Card:
   scale_factor: 0.74
-  channel: 1234402603966660619
+  channel:
 
 Roles:
-  admin: 736977132709871676
-  moderator: 1234497044501233756
-  verified: 1234406660097708052
-  muted: 1250504410346426470
+  admin:
+  moderator:
+  verified:
+  muted:
   Descriptors:
-    gamer: 1234429413639196714
-    musician: 1234429523034902528
-    dj: 1234429580677353535
-    photographer: 1234429656032215041
-    content_creator: 1234429697601835038
-    visual_artist: 1234429735358955622
+    gamer:
+    musician:
+    dj:
+    photographer:
+    content_creator:
+    visual_artist:
   Pronouns:
-    he_him: 1234430001508651018
-    she_her: 1234430039290806272
-    they_them: 1234430115409297408
-    other_ask: 1234430147646586900
-    skibidy_toilet: 1234467117370183730
+    he_him:
+    she_her:
+    they_them:
+    other_ask:
+    skibidy_toilet:
   Regions:
-    north_america: 1234430247340871760
-    south_america: 1234430426035126334
-    europe: 1234430456422727711
-    asia: 1234430493370355753
-    africa: 1234430512978726994
-    oceania_australia: 1234430536903299082
+    north_america:
+    south_america:
+    europe:
+    asia:
+    africa:
+    oceania_australia:
   Pings:
-    youtube: 1234430629274189874
+    youtube:
 
 YouTube:
-  channel_id: UC1vqivmEx6wSMN3GGzdMM4A
+  channel_id:
   check_frequency: 1200 # How often it should check for a new video (in seconds)
-  discord_channel: 1234496240327069726
+  discord_channel:
 
 Random Tips:
   enabled: False
-  channel: 1234412833333051442
+  channel:
 
 Level System:
   update_levels: False
-  update_channel: 1234402356511375401
+  update_channel:
   level_xp_mapping:
     1: 155
     2: 220

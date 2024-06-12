@@ -24,15 +24,19 @@ except FileNotFoundError:
 except yaml.YAMLError:
     raise Exception("Error parsing the configuration file. Invalid YAML format. Please make sure the secret.yml is formatted correctly.")
 
-class Bot:
-    token = secret["Bot Token"]
-    server = config["Server"]["server_id"]
+class Paths:
     root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     logs_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "logs")
     data_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "Data")
     assets_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "Assets")
+    scripts_folder = os.path.join(root_folder, "Scripts")
+
+class Bot:
+    token = secret["Bot Token"]
+    server = config["Server"]["server_id"]
     darkyl_id = config["Owner"]["darkyl_id"]
     verified_role = config["Roles"]["verified"]
+    muted_role = config["Roles"]["muted"]
     logs_channel = config["Channels"]["logs"]
     random_tips = config["Random Tips"]["enabled"]
     random_tips_channel = config["Random Tips"]["channel"]
@@ -45,7 +49,7 @@ class Bot:
     worm_is_running = False
 
 class Join:
-    overlay_path = os.path.join(Bot.assets_folder, "Welcome Image.png")
+    overlay_path = os.path.join(Paths.assets_folder, "Welcome Image.png")
     channel = config["Welcome Card"]["channel"]
     welcome_card_scale_factor = config["Welcome Card"]["scale_factor"]
 
@@ -69,11 +73,14 @@ class ReactionRoles:
     skibidy_toilet_role = config["Roles"]["Pronouns"]["skibidy_toilet"]
     youtube_ping_role = config["Roles"]["Pings"]["youtube"]
 
+class Channels:
+    admin = config["Channels"]["admin"]
+
 class YouTube:
     ping_role = config["Roles"]["Pings"]["youtube"]
     api_key = secret["YouTube API Key"]
     channel = config["YouTube"]["channel_id"]
-    last_uploaded_video_file = os.path.join(Bot.data_folder, "last_uploaded_video.txt")
+    last_uploaded_video_file = os.path.join(Paths.data_folder, "last_uploaded_video.txt")
     provided_check_frequency = config["YouTube"]["check_frequency"]
     check_frequency = 3600
     discord_channel = config["YouTube"]["discord_channel"]
@@ -118,6 +125,7 @@ def validate():
         "Roles.admin": int,
         "Roles.moderator": int,
         "Roles.verified": int,
+        "Roles.muted": int,
         "Roles.Descriptors.gamer": int,
         "Roles.Descriptors.musician": int,
         "Roles.Descriptors.dj": int,
@@ -176,3 +184,18 @@ def validate():
                 raise InvalidConfigError(f"Key '{key}' in config.yml is supposed to be a {expected_type.__name__}.")
 
     YouTube.check_frequency = YouTube.provided_check_frequency
+
+    required_paths = [
+        secret_path,
+        config_path,
+        Paths.logs_folder,
+        Paths.assets_folder,
+        Paths.data_folder,
+        Paths.scripts_folder,
+        os.path.join(Paths.scripts_folder, "ext"),
+        os.path.join(Paths.scripts_folder, "AutoMod"),
+    ]
+
+    for path in required_paths:
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Path {path} couldn't be found")

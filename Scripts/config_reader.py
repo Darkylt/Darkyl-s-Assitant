@@ -104,9 +104,6 @@ class AutoMod:
 class Level:
     leve_from_xp_mapping = config["Level System"]["level_xp_mapping"]
 
-class Stats:
-    api_key = secret["Tracker.gg API Key"]
-
 class InvalidConfigError(Exception):
     pass
 

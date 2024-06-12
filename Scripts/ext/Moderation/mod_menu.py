@@ -64,13 +64,13 @@ async def mod_menu_command(ctx: lightbulb.SlashContext, user: hikari.User):
         embed.add_field("**• Commands Used:**", value=cmds_used)
         embed.add_field("**• XP:**", value=xp)
         embed.add_field("**• Level:**", value=level)
-        embed.add_field("**• Opted Out of NSFW:**", value=nsfw_opt_out)
+        embed.add_field("**• Opted Out of NSFW:**", value=bool(nsfw_opt_out))
 
     roles_list = [role.mention for role in utils.sort_roles(user.get_roles()) if role.id != ctx.guild_id]
     roles = ", ".join(roles_list) if roles_list else "`-`"
     embed.add_field("**• Roles:**", value=f"{roles}")
 
-    warnings_file = os.path.join(config.Bot.data_folder, "User Data", "warnings.json")
+    warnings_file = os.path.join(config.Paths.data_folder, "User Data", "warnings.json")
 
     if os.path.exists(warnings_file):
         with open(warnings_file, "r") as file:
@@ -88,7 +88,7 @@ async def mod_menu_command(ctx: lightbulb.SlashContext, user: hikari.User):
         embed.add_field("**• Reported user:**", value=reported)
         embed.add_field("**• Been reported:**", value=been_reported)
 
-    reports_file = os.path.join(config.Bot.data_folder, "User Data", "reports.json")
+    reports_file = os.path.join(config.Paths.data_folder, "User Data", "reports.json")
 
     if os.path.exists(reports_file):
         with open(reports_file, "r") as file:

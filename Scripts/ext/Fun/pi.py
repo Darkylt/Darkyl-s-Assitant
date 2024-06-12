@@ -1,21 +1,18 @@
-"""
-Mhhh... so tasty apple pi
-"""
 import os
 import random
 import json
-
 import hikari
 import lightbulb
 
 import bot_utils as utils
 import config_reader as config
 
-PI_LENGTH = 100000000 # Length of pi currently in the file
-
-formatted_number = '{:,}'.format(PI_LENGTH).replace(',', '.')
-
 plugin = lightbulb.Plugin("pi", "Pi related commands")
+
+pi_length = 0
+
+def formatted_number():
+    return '{:,}'.format(pi_length).replace(',', '.')
 
 @plugin.command
 @lightbulb.add_cooldown(3, 3, lightbulb.GlobalBucket)
@@ -26,9 +23,8 @@ async def searchpi_command(ctx: lightbulb.context.SlashContext, number) -> None:
     if not await utils.validate_command(ctx):
         return
 
-    pi_file = os.path.join(config.Bot.assets_folder, "Text", "pi.txt")
+    pi_file = os.path.join(config.Paths.assets_folder, "Text", "pi.txt")
 
-    # Convert the number to a string
     number_str = str(number)
     number_len = len(number_str)
 
@@ -55,20 +51,30 @@ async def searchpi_command(ctx: lightbulb.context.SlashContext, number) -> None:
                 position += chunk_size - overlap
                 f.seek(position)
                 chunk = f.read(chunk_size)
+
+                # Combine the end of the previous chunk with the new chunk to handle overlaps
+                if len(chunk) > 0:
+                    combined_chunk = chunk[-overlap:] + chunk[:overlap]
+                    index = combined_chunk.find(number_str)
+                    if index != -1:
+                        # Adjust the index based on the actual position in the file
+                        await message.edit(f"The number {number_str} was found at position **{position - overlap + index}** of pi.")
+                        return
             
-            pi_jokes_file = os.path.join(config.Bot.assets_folder, "Text", "pijokes.json")
+            pi_jokes_file = os.path.join(config.Paths.assets_folder, "Text", "pijokes.json")
 
             with open(pi_jokes_file, 'r') as jf:
                 jokes = json.load(jf)
             
             joke = random.choice(jokes)
 
-            await message.edit(f"The number {number_str} was not found in the first {formatted_number} digits of pi.\n\nHere's a joke about pi instead:\n{joke['setup']}\n||{joke['punchline']}||")
+            await message.edit(f"The number {number_str} was not found in the first {formatted_number()} digits of pi.\n\nHere's a joke about pi instead:\n{joke['setup']}\n||{joke['punchline']}||")
     
     except Exception as e:
         from bot import logger
         logger.error(f"An error occurred during pi_search command: {e}")
         await message.edit(f"An error occurred! {utils.error_fun}")
+
 
 @plugin.command
 @lightbulb.command("pi_fact", "Get a random fact about pi.")
@@ -77,7 +83,7 @@ async def pi_fact_command(ctx: lightbulb.context.SlashContext) -> None:
     if not await utils.validate_command(ctx):
         return
 
-    facts_file = os.path.join(config.Bot.assets_folder, "Text", "pifacts.txt")
+    facts_file = os.path.join(config.Paths.assets_folder, "Text", "pifacts.txt")
     
     try:
         with open(facts_file, "r", encoding='utf-8') as file:
@@ -115,7 +121,7 @@ def get_segment_statistic(segment: int, total_digits: int):
     return formatted_string
 
 @plugin.command
-@lightbulb.option("start", "Where should the segment start", type=int, required=True, max_value=(PI_LENGTH-1), min_value=1)
+@lightbulb.option("start", "Where should the segment start", type=int, required=True, max_value=(pi_length-1), min_value=1)
 @lightbulb.option("length", "The length of the segment", type=int, required=True, max_value=1500, min_value=1)
 @lightbulb.command("pi_segment", "Get a segment of pi with stats about it.", pass_options=True)
 @lightbulb.implements(lightbulb.commands.SlashCommand)
@@ -123,14 +129,14 @@ async def pi_segment_command(ctx: lightbulb.context.SlashContext, start, length)
     if not await utils.validate_command(ctx):
         return
     
-    pi_file = os.path.join(config.Bot.assets_folder, "Text", "pi.txt")
+    pi_file = os.path.join(config.Paths.assets_folder, "Text", "pi.txt")
     
-    if start < 1 or start > (PI_LENGTH-1):
-        await ctx.resolved(f"Please enter a start position between 1 and {formatted_number}.", flags=hikari.MessageFlag.EPHEMERAL)
+    if start < 1 or start > (pi_length-1):
+        await ctx.respond(f"Please enter a start position between 1 and {formatted_number()}.", flags=hikari.MessageFlag.EPHEMERAL)
         return
     
-    if length < 1 or start + length - 1 > PI_LENGTH:
-        await ctx.respond(f"I can only calculate pi up to {PI_LENGTH}", flags=hikari.MessageFlag.EPHEMERAL)
+    if length < 1 or start + length - 1 > pi_length:
+        await ctx.respond(f"I can only calculate pi up to {pi_length}", flags=hikari.MessageFlag.EPHEMERAL)
         return
     
     try:
@@ -149,6 +155,44 @@ async def pi_segment_command(ctx: lightbulb.context.SlashContext, start, length)
         from bot import logger
         logger.error(f"An error occurred in /pi_segment command: {e}")
         await ctx.respond(f"An error occurred! {utils.error_fun}", flags=hikari.MessageFlag.EPHEMERAL)
+
+async def count_characters_in_file(file_path, chunk_size=1024*1024):
+    """
+    Counts the number of characters in a file without loading the entire file into memory.
+    
+    Args:
+        file_path (str): The path to the file.
+        chunk_size (int): The size of the chunks to read the file in bytes. Default is 1MB.
+
+    Returns:
+        int: The total number of characters in the file.
+    """
+    total_characters = 0
+
+    with open(file_path, 'r') as file:
+        while True:
+            chunk = file.read(chunk_size)
+            if not chunk:
+                break
+            total_characters += len(chunk)
+    
+    return total_characters
+
+async def count_pi():
+    global pi_length
+
+    from bot import logger
+
+    logger.info("Counting pi.txt")
+
+    pi_file = os.path.join(config.Paths.assets_folder, "Text", "pi.txt")
+    pi_length = await count_characters_in_file(pi_file)
+
+    logger.info("Finished counting pi.txt")
+
+@plugin.listener(hikari.StartedEvent)
+async def on_startup(event: hikari.StartedEvent):
+    await count_pi()
 
 def load(bot):
     bot.add_plugin(plugin)

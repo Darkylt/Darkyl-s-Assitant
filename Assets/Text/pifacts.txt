@@ -1,6 +1,5 @@
 Pi is a mathematical symbol that represents the circumferential ratio of a circle to its diameter.
 Its value is about 3.14159.
-I have Pi stored up to 100.000.000 digits.
 The “π” symbol, which means “periphery” or “perimeter,” describes a circle’s circumference.
 Pi is also known as “Archimedes’ constant,” “the circular constant,” or “Ludolph’s number.”
 Pi is irrational, meaning it can't be expressed as a simple fraction, and its decimal representation goes on forever without repeating, making it impossible to pinpoint its exact value.

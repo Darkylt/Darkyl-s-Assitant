@@ -1,56 +1,58 @@
 Server:
-  server_id:
+  server_id: 719633317422432366
 
 Owner:
-  darkyl_id:
+  darkyl_id: 671019102583783434
 
 Channels:
-  logs:
-  reports:
+  logs: 1234402356511375401
+  reports: 1234402392808624128
+  admin: 739033247165579274
 
 Welcome Card:
   scale_factor: 0.74
-  channel:
+  channel: 1234402603966660619
 
 Roles:
-  admin:
-  moderator:
-  verified:
+  admin: 736977132709871676
+  moderator: 1234497044501233756
+  verified: 1234406660097708052
+  muted: 1250504410346426470
   Descriptors:
-    gamer:
-    musician:
-    dj:
-    photographer:
-    content_creator:
-    visual_artist:
+    gamer: 1234429413639196714
+    musician: 1234429523034902528
+    dj: 1234429580677353535
+    photographer: 1234429656032215041
+    content_creator: 1234429697601835038
+    visual_artist: 1234429735358955622
   Pronouns:
-    he_him:
-    she_her:
-    they_them:
-    other_ask:
-    skibidy_toilet:
+    he_him: 1234430001508651018
+    she_her: 1234430039290806272
+    they_them: 1234430115409297408
+    other_ask: 1234430147646586900
+    skibidy_toilet: 1234467117370183730
   Regions:
-    north_america:
-    south_america:
-    europe:
-    asia:
-    africa:
-    oceania_australia:
+    north_america: 1234430247340871760
+    south_america: 1234430426035126334
+    europe: 1234430456422727711
+    asia: 1234430493370355753
+    africa: 1234430512978726994
+    oceania_australia: 1234430536903299082
   Pings:
-    youtube:
+    youtube: 1234430629274189874
 
 YouTube:
-  channel_id:
+  channel_id: UC1vqivmEx6wSMN3GGzdMM4A
   check_frequency: 1200 # How often it should check for a new video (in seconds)
-  discord_channel:
+  discord_channel: 1234496240327069726
 
 Random Tips:
   enabled: False
-  channel:
+  channel: 1234412833333051442
 
 Level System:
   update_levels: False
-  update_channel:
+  update_channel: 1234402356511375401
   level_xp_mapping:
     1: 155
     2: 220
@@ -205,7 +207,10 @@ Moderation:
   filter_nsfw_words: False
   
   roast_api_censored_words: # Used for censoring specific words out of the insult API
-
+    - "Neger"
+    - "Nigger"
+    - "neger"
+    - "nigger"
   
   Warnings:
     kick_threshold: 3 # How many warnings until kick
@@ -253,6 +258,7 @@ Help Messages:
     **/pi_search:** Search for a number in pi.
     **/pi_fact:** Get a random fact about pi.
     **/pi_segment:** Get a segment of pi with stats about it.
+    **/suggest:** Suggest something to the admins anonymously.
   
   admin_commands: |
     **/admin_tst:** A command used for testing the bot.
@@ -268,6 +274,11 @@ Help Messages:
     **/timeout:** Timeout a member.
     **/purge:** Purge messages from this channel. (Also: /clear, /prune)
     **/mod_menu:** Your control panel for a user
+    **/mute:** Mute a user.
+    **/unmute:** Unmute a user.
+    **/configure_mute_role:** Give the mute role the proper restrictions.
+    **/add_role:** Give a role to a user.
+    **/remove_role:** Remove a role of a user.
 
   fun_commands: |
     Some commands to have a little fun. Spice up the server or do a little trolling 😈.
@@ -304,6 +315,7 @@ Help Messages:
     **/wiki:** Search Wikipedia for articles!
     **/nsfw_opt_out:** Choose not to be included in NSFW contexts by the bot
     **/time_in:** Get the time
+    **/suggest:** Suggest something to the admins anonymously.
 
 # Unused Sections
 # Make sure to add them to the config validation if you decide to use these

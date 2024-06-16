@@ -59,6 +59,7 @@ Here are some of the commands supported by Darkyl's Assistant:
 -  **/pi_search:** Search for a number in pi.
 -  **/pi_fact:** Get a random fact about pi.
 -  **/pi_segment:** Get a segment of pi with stats about it.
+-  **/suggest:** Suggest something to the admins anonymously.
 
 ## Support
 

@@ -8,6 +8,9 @@ Channels:
   logs:
   reports:
   admin:
+  Confessions:
+    channel:
+    approving:
 
 Welcome Card:
   scale_factor: 0.74
@@ -45,7 +48,7 @@ YouTube:
   channel_id:
   check_frequency: 1200 # How often it should check for a new video (in seconds)
   discord_channel:
-
+  
 Random Tips:
   enabled: False
   channel:
@@ -316,7 +319,47 @@ Help Messages:
     **/nsfw_opt_out:** Choose not to be included in NSFW contexts by the bot
     **/time_in:** Get the time
     **/suggest:** Suggest something to the admins anonymously.
+  
+  privacy: |
+    # 1. Data Collected:
+    We only store the data you provide us. Our database includes:
+    - **User ID:** The ID of your Discord account.
+    - **Message Count:** The number of messages you have sent.
+    - **XP:** The XP awarded by the bot.
+    - **Level:** The level assigned by the bot.
+    - **Commands Used:** The number of commands you have used.
+    - **Reported:** The number of reports you have submitted.
+    - **Reports:** The reports themselves.
+    - **Been Reported:** The number of times you have been reported.
+    - **Warnings:** Your current warnings.
+    - **NSFW Status:** If you have opted out of NSFW content.
 
+    **Logging of Commands:**
+    We log which commands you have used, except for the following commands:
+    /suggest
+    /confess
+
+    *Note: Because these aren't stored you cannot earn XP from using these commands*
+
+    # 2. Purpose of Data Collection:
+    We use this information to:
+    - Operate and improve the bot.
+    - Inform trusted moderators.
+
+    # 3. Data Retention:
+    Your data is retained as long as necessary for the purposes outlined above. If you leave the server or request deletion, your data will be removed accordingly.
+
+    # 4. User Rights:
+    You have the right to access, correct, or delete your data. If you have any concerns about your data, please contact Darkyl or check out the source code [here](https://github.com/Darkylt/Darkyl-s-Assitant).
+
+  confession: |
+    This bot has a confession functionality.
+    You can use **/confess** to send a confession.
+
+    Confessions are entirely anonymous. No data is being stored that can be traced back to you.
+    We temporarily store the confession text and Image in our database until the confession has either been submitted or dismissed. This is in order to make the bot function properly.
+
+    The confessions need to follow the server Rules of course. Support for NSFW confessions might be added if requested.
 # Unused Sections
 # Make sure to add them to the config validation if you decide to use these
 Rules Discord: |

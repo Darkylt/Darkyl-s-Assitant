@@ -60,6 +60,7 @@ Here are some of the commands supported by Darkyl's Assistant:
 -  **/pi_fact:** Get a random fact about pi.
 -  **/pi_segment:** Get a segment of pi with stats about it.
 -  **/suggest:** Suggest something to the admins anonymously.
+-  **/confess:** Confess something anonysmously
 
 ## Support
 

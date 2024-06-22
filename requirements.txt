@@ -11,7 +11,6 @@ schedule==1.2.1
 nekos.py==1.1.0
 selenium==4.20.0
 webdriver-manager==4.0.1
-rule34Py==1.4.11
 nltk==3.8.1
 pytz==2024.1
 captcha==0.5.0

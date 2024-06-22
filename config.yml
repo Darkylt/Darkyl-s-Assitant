@@ -219,6 +219,9 @@ Moderation:
     kick_threshold: 3 # How many warnings until kick
     ban_threshold: 5 # How many warnings until ban
 
+  force_captcha: False # Only use captcha as verification method
+  disable_captcha: False
+
 Help Messages:
   general: |
     Hello! I'm Darkyl's Assitant!

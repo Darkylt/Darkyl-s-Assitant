@@ -276,6 +276,7 @@ Help Messages:
     **/clear_warnings:** Remove all warnings of someone.
     **/kick:** Kick a user.
     **/ban:** Ban a user.
+    **/tempban:** Ban a user temporarily
     **/slowmode:** Set the slowmode interval for a channel.
     **/timeout:** Timeout a member.
     **/purge:** Purge messages from this channel. (Also: /clear, /prune)

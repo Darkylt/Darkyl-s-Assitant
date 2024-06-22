@@ -7,6 +7,7 @@ Built using Hikari, Lightbulb and Miru
 ## Features
 
 - Simple moderation tools
+- Captcha system
 - Simple auto mod
 - Fun commands!
 

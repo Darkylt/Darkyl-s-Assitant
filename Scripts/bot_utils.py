@@ -5,8 +5,10 @@ from math import floor
 import aiohttp
 import datetime
 import typing as t
+import logging
 
 import hikari
+import hikari.errors
 import lightbulb
 
 import member_managment
@@ -62,13 +64,13 @@ async def choose_random_file(folder_path: str):
 
 async def validate_command(ctx: lightbulb.Context, report: bool = False, nsfw: bool = False, message_command: bool = False) -> bool:
     """
-    Performs some initial processings of a command.
+    Performs some initial processing of a command.
 
     Args:
         ctx: The context of the command
-        report: Wether or not the command is a report
-        nsfw: Wether or not the command is supposed to be NSFW
-        message_command: Wether or not the command is a message command
+        report: Whether or not the command is a report
+        nsfw: Whether or not the command is supposed to be NSFW
+        message_command: Whether or not the command is a message command
     Returns:
         True: Command is free to be executed
         False: One of the checks failed
@@ -79,25 +81,36 @@ async def validate_command(ctx: lightbulb.Context, report: bool = False, nsfw: b
         3: Adds the new info to the user statistics
     """
 
-    try:
-        from bot import logger
+    from bot import logger
 
+    try:
         # Is command author human?
         if ctx.author.is_bot or ctx.author.is_system:
-            await ctx.respond("This command can not be executed by other bots.", flags=hikari.MessageFlag.EPHEMERAL)
+            await ctx.respond("This command cannot be executed by other bots.", flags=hikari.MessageFlag.EPHEMERAL)
             return False
         
         if nsfw:
+            try:
+                # Check if it's an nsfw channel
+                channel = await ctx.app.rest.fetch_channel(ctx.channel_id)
+                if not channel.is_nsfw:
+                    await ctx.respond("This command can only be run in a channel marked as NSFW.", flags=hikari.MessageFlag.EPHEMERAL)
+                    return False
 
-            # Check if it's an nsfw channel
-            channel = await ctx.app.rest.fetch_channel(ctx.channel_id)
-            if not channel.is_nsfw:
-                await ctx.respond("This command can only be run in a channel marked as NSFW.", flags=hikari.MessageFlag.EPHEMERAL)
+                # Check if the command author is nsfw blacklisted
+                if await nsfw_blacklisted(ctx.author.id):
+                    await ctx.respond("You opted out of NSFW commands.", flags=hikari.MessageFlag.EPHEMERAL)
+                    return False
+            except hikari.errors.ForbiddenError:
+                await ctx.respond("I do not have access to this channel.", flags=hikari.MessageFlag.EPHEMERAL)
                 return False
-
-            # Check if the command author is nsfw blacklisted
-            if await nsfw_blacklisted(ctx.author.id):
-                await ctx.respond("You opted out of NSFW commands.", flags=hikari.MessageFlag.EPHEMERAL)
+            except hikari.errors.NotFoundError:
+                await ctx.respond("The channel was not found.", flags=hikari.MessageFlag.EPHEMERAL)
+                return False
+            except Exception as e:
+                
+                logger.error(f"An error occurred during NSFW checks: {e}")
+                await ctx.respond("An error occurred while performing checks.", flags=hikari.MessageFlag.EPHEMERAL)
                 return False
 
         if message_command:
@@ -116,7 +129,10 @@ async def validate_command(ctx: lightbulb.Context, report: bool = False, nsfw: b
                 rep=report
             )
         except Exception as e:
-            logger.error(f"An error occured while updating the user stats: {e}")
+            logger.error(f"An error occurred while updating the user stats: {e}")
+            await ctx.respond("An error occurred while updating the user stats.", flags=hikari.MessageFlag.EPHEMERAL)
+            return False
+
         return True
     except Exception as e:
         logger.error(f"Error while validating during /{ctx.command.name}: {e}")
@@ -166,17 +182,16 @@ async def error_fun() -> str:
         An empty string if an error occurred
     """
     try:
-        choice = random.randint(0, 1) #0 means technobabble, 1 means joke
+        choice = random.randint(0, 1)  # 0 means technobabble, 1 means joke
 
         if choice == 0:
             text = await technobabble()
-        elif choice == 1:
+        else:
             joke = await coding_joke()
             text = f"Let me lighten the mood with a coding joke:\n{joke}"
         
-        if text == "" or joke == "":
+        if not text:
             return ""
-
         return f"\n{text}"
     except Exception as e:
         from bot import logger
@@ -193,6 +208,7 @@ async def technobabble() -> str:
     """
     try:
         h = []
+
         def j(b):
             c = jargonWordPool[b]
             e = floor(random.random() * len(c))
@@ -201,6 +217,7 @@ async def technobabble() -> str:
                 f = c[floor(random.random() * len(c))]
             h.append(f)
             return f
+        
         rnd = floor(random.random() * len(jargonConstructs))
         construct = jargonConstructs[rnd]
 
@@ -208,9 +225,10 @@ async def technobabble() -> str:
         while e < len(jargonWordPool):
             f = "{" + str(e) + "}"
             while construct.find(f) > -1:
-                construct = construct.replace(f, j(e),1)
-            e+=1
-            construct = construct[0].upper() + construct[1:]
+                construct = construct.replace(f, j(e), 1)
+            e += 1
+
+        construct = construct[0].upper() + construct[1:]
         return str(construct)
     except Exception as e:
         from bot import logger
@@ -225,47 +243,36 @@ async def coding_joke() -> str:
         The joke
         An empty string if an error occurred 
     """
+    url = "https://v2.jokeapi.dev/joke/Coding?blacklistFlags=political,racist,sexist"
+    params = {
+        "format": "json",
+        "amount": 1,
+        "lang": "en"
+    }
+
     try:
-        params = {
-            "format": "json",
-            "amount": 1,
-            "lang": "en"
-        }
-
-        url = "https://v2.jokeapi.dev/joke/Coding?blacklistFlags=political,racist,sexist"
-
-        joke_txt = ""
-
+        from bot import logger
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
-
-                    type = data["type"]
-
-                    if type == "twopart":
-                            setup = data["setup"]
-                            delivery = data["delivery"]
-                            joke_txt = f"{setup}\n||{delivery}||"
-                    elif type == "single":
-                        joke = data["joke"]
-                        joke_txt = joke
-                    elif data["error"] == "true":
-                        joke_txt = ""
-                    else:
-                        joke_txt = ""
+                    if data.get("error"):
+                        return ""
+                    if data["type"] == "twopart":
+                        return f"{data['setup']}\n||{data['delivery']}||"
+                    elif data["type"] == "single":
+                        return data["joke"]
                 else:
-                    from bot import logger
                     logger.error(f"Failed to fetch joke during error_fun: {response.status}")
-                    joke_txt = ""
-        
-        return joke_txt
+        return ""
+    except aiohttp.ServerTimeoutError:
+        logger.error(f"Failed to fetch coding joke: API timed out.")
+        return ""
     except Exception as e:
-        from bot import logger
         logger.error(f"Error during error_fun in coding_joke(): {e}")
         return ""
 
-async def count_lines_in_files(directory, file_extensions: list = [".txt", ".py", "", ".yml", ".log", ".json", ".pxd", ".pxi", ".pyi", ".hash", ".pem", ".js", ".html", ".css"]):
+async def count_lines_in_files(directory, file_extensions: list[str] = [".txt", ".py", "", ".yml", ".log", ".json", ".pxd", ".pxi", ".pyi", ".hash", ".pem", ".js", ".html", ".css"]):
     """
     A function that counts the lines in the files for a given directory
 

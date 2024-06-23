@@ -1,30 +1,56 @@
 import sqlite3
 import os
-
 import config_reader as config
 
 
 DB_PATH = os.path.join(config.Paths.data_folder, "Database", "users.db")
 
 def get_database_connection():
-    return sqlite3.connect(DB_PATH)
+    try:
+        return sqlite3.connect(DB_PATH)
+    except FileNotFoundError as e:
+        from bot import logger
+        logger.error(f"Couldn't find path to database: {e}")
+        return None
+    except sqlite3.Error as e:
+        from bot import logger
+        logger.error(f"SQLite error occurred while trying to connect to database: {e}")
+        return None
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An unexpected error occurred while trying to connect to database: {e}")
+        return None
 
 def create_user_entry(user_id, message_count, xp, level, commands_used, reported, been_reported, nsfw_opt_out):
     nsfw_opt_out = int(nsfw_opt_out)
     try:
-        with get_database_connection() as connection:
-            cursor = connection.cursor()
-            new_user = (user_id, message_count, xp, level, commands_used, reported, been_reported, nsfw_opt_out)
-            cursor.execute('''
-                INSERT INTO users (id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', new_user)
-            connection.commit()
-            return new_user
+        connection = get_database_connection()
+        if connection:
+            with connection:
+                cursor = connection.cursor()
+                new_user = (user_id, message_count, xp, level, commands_used, reported, been_reported, nsfw_opt_out)
+                cursor.execute('''
+                    INSERT INTO users (id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', new_user)
+                connection.commit()
+                return new_user
+    except sqlite3.IntegrityError as e:
+        from bot import logger
+        logger.error(f"Integrity error while creating user entry: {e}")
+    except sqlite3.OperationalError as e:
+        from bot import logger
+        logger.error(f"Operational error while creating user entry: {e}")
+    except sqlite3.ProgrammingError as e:
+        from bot import logger
+        logger.error(f"Programming error while creating user entry: {e}")
     except sqlite3.Error as e:
         from bot import logger
-        logger.error(f"Error while creating user entry: {e}")
-        return None
+        logger.error(f"SQLite error while creating user entry: {e}")
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An unexpected error occurred while creating new user entry: {e}")
+    return None
 
 def get_user_entry(user_id: int, values=None):
     """
@@ -32,35 +58,34 @@ def get_user_entry(user_id: int, values=None):
 
     Args:
         user_id (int): The id of the user you want to get the entry for
-        values (list os strings): Optional. A list of values you want to retrieve from the entry. If not specified, everything will be retrieved
+        values (list of strings): Optional. A list of values you want to retrieve from the entry. If not specified, everything will be retrieved
             possible_values: (id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out)
     Returns:
-        user_data (tuple): The databse entry with the specified values
+        user_data (tuple): The database entry with the specified values
         None: If the user wasn't found or there was an error
     """
-
     try:
-        with get_database_connection() as connection:
-            cursor = connection.cursor()
-            if values:
-                columns = ", ".join(values)
-                cursor.execute(f"SELECT {columns} FROM users WHERE id = ?", (user_id,))
-                user_data = cursor.fetchone()
-                if user_data:
-                    return tuple(user_data)
+        connection = get_database_connection()
+        if connection:
+            with connection:
+                cursor = connection.cursor()
+                if values:
+                    columns = ", ".join(values)
+                    cursor.execute(f"SELECT {columns} FROM users WHERE id = ?", (user_id,))
                 else:
-                    return None
-            else:
-                cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+                    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
                 user_data = cursor.fetchone()
-                if user_data:
-                    return tuple(user_data)
-                else:
-                    return None
+                return tuple(user_data) if user_data else None
+    except sqlite3.OperationalError as error:
+        from bot import logger
+        logger.error(f"Operational error while reading user entry: {error}")
     except sqlite3.Error as error:
         from bot import logger
-        logger.error(f"Error while reading user entry: {error}")
-        return None
+        logger.error(f"SQLite error while reading user entry: {error}")
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An unexpected error occurred while reading user entry: {e}")
+    return None
 
 def update_user_entry(user_id: int, increment: bool = True, msg_count: int = 0, xp: int = 0, level: int = 0, cmds_used: int = 0, reported: int = 0, been_reported: int = 0, nsfw_opt_out: int = None) -> bool:
     """
@@ -80,71 +105,88 @@ def update_user_entry(user_id: int, increment: bool = True, msg_count: int = 0, 
         True: Success
         False: Error
     """
-    
     try:
-        with get_database_connection() as connection:
-            cursor = connection.cursor()
-            
-            if increment:
-                # Increment the values
-                sql = """
-                    UPDATE users 
-                    SET msg_count = msg_count + ?, xp = xp + ?, level = level + ?, cmds_used = cmds_used + ?, 
-                        reported = reported + ?, been_reported = been_reported + ?
-                """
-                params = [msg_count, xp, level, cmds_used, reported, been_reported]
-                if nsfw_opt_out is not None:
-                    sql += ", nsfw_opt_out = ?"
-                    params.append(nsfw_opt_out)
-                sql += " WHERE id = ?"
-                params.append(int(user_id))
-                cursor.execute(sql, params)
-            else:
-                # Replace the values
-                sql = """
-                    UPDATE users 
-                    SET msg_count = ?, xp = ?, level = ?, cmds_used = ?, reported = ?, been_reported = ?
-                """
-                params = [msg_count, xp, level, cmds_used, reported, been_reported]
-                if nsfw_opt_out is not None:
-                    sql += ", nsfw_opt_out = ?"
-                    params.append(nsfw_opt_out)
-                sql += " WHERE id = ?"
-                params.append(int(user_id))
-                cursor.execute(sql, params)
-            
-            # Check if any rows were affected
-            if cursor.rowcount == 0:
-                # No rows were updated, user does not exist, create user entry
-                create_user_entry(user_id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out)
-            
-            # Commit the transaction
-            connection.commit()
-            return True
+        connection = get_database_connection()
+        if connection:
+            with connection:
+                cursor = connection.cursor()
+                
+                if increment:
+                    # Increment the values
+                    sql = """
+                        UPDATE users 
+                        SET msg_count = msg_count + ?, xp = xp + ?, level = level + ?, cmds_used = cmds_used + ?, 
+                            reported = reported + ?, been_reported = been_reported + ?
+                    """
+                    params = [msg_count, xp, level, cmds_used, reported, been_reported]
+                    if nsfw_opt_out is not None:
+                        sql += ", nsfw_opt_out = ?"
+                        params.append(nsfw_opt_out)
+                    sql += " WHERE id = ?"
+                    params.append(int(user_id))
+                    cursor.execute(sql, params)
+                else:
+                    # Replace the values
+                    sql = """
+                        UPDATE users 
+                        SET msg_count = ?, xp = ?, level = ?, cmds_used = ?, reported = ?, been_reported = ?
+                    """
+                    params = [msg_count, xp, level, cmds_used, reported, been_reported]
+                    if nsfw_opt_out is not None:
+                        sql += ", nsfw_opt_out = ?"
+                        params.append(nsfw_opt_out)
+                    sql += " WHERE id = ?"
+                    params.append(int(user_id))
+                    cursor.execute(sql, params)
+                
+                # Check if any rows were affected
+                if cursor.rowcount == 0:
+                    # No rows were updated, user does not exist, create user entry
+                    create_user_entry(user_id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out)
+                
+                # Commit the transaction
+                connection.commit()
+                return True
 
+    except sqlite3.IntegrityError as e:
+        from bot import logger
+        logger.error(f"Integrity error while updating user entry: {e}")
+    except sqlite3.OperationalError as e:
+        from bot import logger
+        logger.error(f"Operational error while updating user entry: {e}")
+    except sqlite3.ProgrammingError as e:
+        from bot import logger
+        logger.error(f"Programming error while updating user entry: {e}")
     except sqlite3.Error as e:
         from bot import logger
-        logger.error(f"Error while updating user entry: {e}")
-        return False
-
-
+        logger.error(f"SQLite error while updating user entry: {e}")
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An unexpected error occurred while updating user entry: {e}")
+    return False
 
 def update_nsfw_status(user_id: int, nsfw_opt_out: bool) -> bool:
     nsfw_opt_out = int(nsfw_opt_out)
 
-
     try:
-        with get_database_connection() as connection:
-            cursor = connection.cursor()
-
-            cursor.execute("""
-                UPDATE users 
-                SET nsfw_opt_out = ? 
-                WHERE id = ?
-            """, (nsfw_opt_out, int(user_id)))
-
-            return True
+        connection = get_database_connection()
+        if connection:
+            with connection:
+                cursor = connection.cursor()
+                cursor.execute("""
+                    UPDATE users 
+                    SET nsfw_opt_out = ? 
+                    WHERE id = ?
+                """, (nsfw_opt_out, int(user_id)))
+                connection.commit()
+                return True
+    except sqlite3.OperationalError as e:
+        from bot import logger
+        logger.error(f"Operational error while updating nsfw status in the database: {e}")
+    except sqlite3.Error as e:
+        from bot import logger
+        logger.error(f"SQLite error while updating nsfw status in the database: {e}")
     except Exception as e:
         from bot import logger
-        logger.error(f"Error while updating nsfw status in the database: {e}")
-        return False
+        logger.error(f"An unexpected error occurred while updating nsfw status in the database: {e}")
+    return False

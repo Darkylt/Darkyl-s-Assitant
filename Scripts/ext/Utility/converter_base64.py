@@ -1,4 +1,5 @@
 import base64
+import binascii
 
 import lightbulb
 import hikari
@@ -23,10 +24,13 @@ def encode(value: str):
         str: The encoded base64 string.
     """
 
-    sample_string_bytes = value.encode("utf-8")
-    base64_bytes = base64.b64encode(sample_string_bytes)
-    base64_string = base64_bytes.decode("utf-8")
-    return base64_string
+    try:
+        sample_string_bytes = value.encode("utf-8")
+        base64_bytes = base64.b64encode(sample_string_bytes)
+        base64_string = base64_bytes.decode("utf-8")
+        return base64_string, None
+    except (binascii.Error, UnicodeDecodeError) as e:
+        return None, str(e)
 
 def decode(value: str):
     """
@@ -35,13 +39,17 @@ def decode(value: str):
     Args:
         value (str): A base64 string to be decoded.
     Returns:
-        str: The decoded text string.
+        tuple: A tuple where the first element is the decoded text string (or an empty string if decoding fails),
+               and the second element is either None (indicating success) or the error message (if decoding fails).
     """
 
-    base64_bytes = value.encode("utf-8")
-    sample_string_bytes = base64.b64decode(base64_bytes)
-    sample_string = sample_string_bytes.decode("utf-8")
-    return sample_string
+    try:
+        base64_bytes = value.encode("utf-8")
+        sample_string_bytes = base64.b64decode(base64_bytes)
+        sample_string = sample_string_bytes.decode("utf-8")
+        return sample_string, None
+    except (binascii.Error, UnicodeDecodeError) as e:
+        return None, str(e)
 
 @plugin.command
 @lightbulb.add_cooldown(3, 3, lightbulb.UserBucket)
@@ -56,14 +64,19 @@ async def converter_base64_command(ctx: lightbulb.SlashContext, mode:str, value:
     try:
         if mode == "text to b64":
             direction = "Base64 🡪 UTF-8"
-            final = decode(value)
+            result, error_message = decode(value)
         elif mode == "b64 to text":
             direction = "Base64 🡨 UTF-8"
-            final = encode(value)
+            result, error_message = encode(value)
         else:
             await ctx.respond("Invalid input for 'mode'.", flags=hikari.MessageFlag.EPHEMERAL)
             return
-        await ctx.respond(embed=hikari.Embed(title=f"{direction} Conversion:", description=f"```{final}```"))
+        
+        if result == None:
+            await ctx.respond(f"Couldn't use your input: {error_message}")
+            return
+
+        await ctx.respond(embed=hikari.Embed(title=f"{direction} Conversion:", description=f"```{result}```"))
     except UnicodeEncodeError:
         await ctx.respond("Found an unsupported character. I can't decode your input.", flags=hikari.MessageFlag.EPHEMERAL)
 

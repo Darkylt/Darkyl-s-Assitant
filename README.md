@@ -62,6 +62,12 @@ Here are some of the commands supported by Darkyl's Assistant:
 -  **/pi_segment:** Get a segment of pi with stats about it.
 -  **/suggest:** Suggest something to the admins anonymously.
 -  **/confess:** Confess something anonysmously
+-  **/add_role:** Give a role to a user.
+-  **/remove_role:** Remove a role of a user.
+-  **/custom_role:** Give a custom role to someone
+-  **/fakeban:** Do some trolling by fake banning someone
+-  **/fakekick:** Do some trolling by fake kicking someone
+-  **/flood_of_pings:** Ping specified user number of times
 
 ## Support
 

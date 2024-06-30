@@ -8,23 +8,22 @@ import config_reader as config
 plugin = lightbulb.Plugin("Kick", "Kick a user")
 plugin.add_checks(lightbulb.has_role_permissions(hikari.Permissions.KICK_MEMBERS))
 
-
 @plugin.command
 @lightbulb.add_cooldown(3, 3, lightbulb.UserBucket)
 @lightbulb.app_command_permissions(hikari.Permissions.KICK_MEMBERS, dm_enabled=False)
 @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.KICK_MEMBERS))
 @lightbulb.option("user", "The user that should be kicked", type=hikari.OptionType.USER)
-@lightbulb.option("reason", "Why is the user being banned?", required=False, default=None)
-@lightbulb.command("kick", "Kick a user")
+@lightbulb.option("reason", "Why is the user being banned?", type=str, required=False, default=None)
+@lightbulb.command("kick", "Kick a user", pass_options=True, auto_defer=True, ephemeral=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def kick_command(ctx: lightbulb.SlashContext):
+async def kick_command(ctx: lightbulb.SlashContext, user: hikari.User, reason: str):
     """
     A command to kick a user.
 
     It processes the provided info and then kicks the user.
 
     Processing:
-        Retreiving provided information
+        Retrieving provided information
         Fetching the user
         Kicking the user
         Responding and logging
@@ -34,30 +33,33 @@ async def kick_command(ctx: lightbulb.SlashContext):
         return
 
     try:
-        provided_user = ctx.options.user
-        reason = ctx.options.reason
-
-        user = await plugin.bot.application.app.rest.fetch_user(provided_user)
-
-        guild = ctx.guild_id
+        guild_id = ctx.guild_id
+        user_id = user.id
+        user_name = user.global_name
+        
         try:
-            await plugin.bot.application.app.rest.kick_user(guild=guild, user=user.id, reason=reason)
+            await ctx.app.rest.kick_user(guild=guild_id, user=user_id, reason=reason)
+            await ctx.respond(f"User {user.mention} ({user_name}) has been kicked successfully.", flags=hikari.MessageFlag.EPHEMERAL)
+
+            from bot import Logging
+            await Logging.log_message(f"User {user.mention} ({user_name}) has been kicked. Reason: {reason}")
+
         except hikari.errors.ForbiddenError:
             await ctx.respond("I do not have permission to kick the user.", flags=hikari.MessageFlag.EPHEMERAL)
-            return
+        except hikari.errors.NotFoundError:
+            await ctx.respond("The user could not be found.", flags=hikari.MessageFlag.EPHEMERAL)
+        except Exception as e:
+            from bot import logger
+            logger.error(f"An error occurred while trying to kick the user: {e}")
+            await ctx.respond("An error occurred while trying to kick the user. Please try again later.", flags=hikari.MessageFlag.EPHEMERAL)
 
-        await ctx.respond("User has been kicked successfully.", flags=hikari.MessageFlag.EPHEMERAL)
-
-        from bot import Logging
-
-        await Logging.log_message(f"User <@{user.id}> has been kicked.")
     except Exception as e:
         from bot import logger
-        logger.error(f"An error occured during /kick command: {e}")
-        await ctx.respond(f"An error occurred!{await utils.error_fun()}", flags=hikari.MessageFlag.EPHEMERAL)
+        logger.error(f"An error occurred during the /kick command: {e}")
+        await ctx.respond(f"An error occurred! {await utils.error_fun()}", flags=hikari.MessageFlag.EPHEMERAL)
 
 def load(bot):
     bot.add_plugin(plugin)
 
 def unload(bot):
-    bot.remove(plugin)
+    bot.remove_plugin(plugin)

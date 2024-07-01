@@ -1,18 +1,27 @@
 import os
 import random
 import re
-from math import floor
+import math
 import aiohttp
 import datetime
 import typing as t
-import logging
+from io import BytesIO
+import tempfile
 
 import hikari
 import hikari.errors
 import lightbulb
+import segno
+from PIL import Image
+
 
 import member_managment
 import database_interaction
+import config_reader as config
+
+"""
+A collection of useful utility functions
+"""
 
 async def generate_id(folder=None):
     """
@@ -211,14 +220,14 @@ async def technobabble() -> str:
 
         def j(b):
             c = jargonWordPool[b]
-            e = floor(random.random() * len(c))
+            e = math.floor(random.random() * len(c))
             f = c[e]
             while f in h:
-                f = c[floor(random.random() * len(c))]
+                f = c[math.floor(random.random() * len(c))]
             h.append(f)
             return f
         
-        rnd = floor(random.random() * len(jargonConstructs))
+        rnd = math.floor(random.random() * len(jargonConstructs))
         construct = jargonConstructs[rnd]
 
         e = 0
@@ -385,3 +394,272 @@ async def nsfw_blacklisted(user_id: int) -> bool:
     nsfw_opt_out = bool(entry[0])
 
     return nsfw_opt_out
+
+class QRCode():
+    supported_colors = [
+            "aliceblue",
+            "antiquewhite",
+            "aqua",
+            "aquamarine",
+            "azure",
+            "beige",
+            "bisque",
+            "black",
+            "blanchedalmond",
+            "blue",
+            "blueviolet",
+            "brown",
+            "burlywood",
+            "cadetblue",
+            "chartreuse",
+            "chocolate",
+            "coral",
+            "cornflowerblue",
+            "cornsilk",
+            "crimson",
+            "cyan",
+            "darkblue",
+            "darkcyan",
+            "darkgoldenrod",
+            "darkgray",
+            "darkgreen",
+            "darkgrey",
+            "darkkhaki",
+            "darkmagenta",
+            "darkolivegreen",
+            "darkorange",
+            "darkorchid",
+            "darkred",
+            "darksalmon",
+            "darkseagreen",
+            "darkslateblue",
+            "darkslategray",
+            "darkslategrey",
+            "darkturquoise",
+            "darkviolet",
+            "deeppink",
+            "deepskyblue",
+            "dimgray",
+            "dimgrey",
+            "dodgerblue",
+            "firebrick",
+            "floralwhite",
+            "forestgreen",
+            "fuchsia",
+            "gainsboro",
+            "ghostwhite",
+            "gold",
+            "goldenrod",
+            "gray",
+            "green",
+            "greenyellow",
+            "grey",
+            "honeydew",
+            "hotpink",
+            "indianred",
+            "indigo",
+            "ivory",
+            "khaki",
+            "lavender",
+            "lavenderblush",
+            "lawngreen",
+            "lemonchiffon",
+            "lightblue",
+            "lightcoral",
+            "lightcyan",
+            "lightgoldenrodyellow",
+            "lightgray",
+            "lightgreen",
+            "lightgrey",
+            "lightpink",
+            "lightsalmon",
+            "lightseagreen",
+            "lightskyblue",
+            "lightslategray",
+            "lightslategrey",
+            "lightsteelblue",
+            "lightyellow",
+            "lime",
+            "limegreen",
+            "linen",
+            "magenta",
+            "maroon",
+            "mediumaquamarine",
+            "mediumblue",
+            "mediumorchid",
+            "mediumpurple",
+            "mediumseagreen",
+            "mediumslateblue",
+            "mediumspringgreen",
+            "mediumturquoise",
+            "mediumvioletred",
+            "midnightblue",
+            "mintcream",
+            "mistyrose",
+            "moccasin",
+            "navajowhite",
+            "navy",
+            "oldlace",
+            "olive",
+            "olivedrab",
+            "orange",
+            "orangered",
+            "orchid",
+            "palegoldenrod",
+            "palegreen",
+            "paleturquoise",
+            "palevioletred",
+            "papayawhip",
+            "peachpuff",
+            "peru",
+            "pink",
+            "plum",
+            "powderblue",
+            "purple",
+            "red",
+            "rosybrown",
+            "royalblue",
+            "saddlebrown",
+            "salmon",
+            "sandybrown",
+            "seagreen",
+            "seashell",
+            "sienna",
+            "silver",
+            "skyblue",
+            "slateblue",
+            "slategray",
+            "slategrey",
+            "snow",
+            "springgreen",
+            "steelblue",
+            "tan",
+            "teal",
+            "thistle",
+            "tomato",
+            "turquoise",
+            "violet",
+            "wheat",
+            "white",
+            "whitesmoke",
+            "yellow",
+            "yellowgreen"
+        ]
+
+    def validate_color(color):
+        """
+        Validates the color input.
+        
+        Supported color formats:
+            - CSS color names
+            - RGB as tuple (R, G, B)
+            - Hexadecimal (6 char and 8 char with alpha)
+
+        Args:
+            color: The color input to be validated
+        
+        Returns:
+            bool: True if the color is valid, False otherwise
+        """
+
+        if isinstance(color, str):
+            # Check if it's a CSS color name
+            if color.lower() in QRCode.supported_colors:
+                return True
+            # Check if it's a hex color code
+            if re.fullmatch(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$', color):
+                return True
+        elif isinstance(color, tuple) and len(color) == 3:
+            # Check if it's an RGB tuple
+            if all(isinstance(component, int) and 0 <= component <= 255 for component in color):
+                return True
+        return False
+
+    async def validate_colors(*colors):
+        """
+        Validates multiple color inputs.
+        
+        Args:
+            colors: The color inputs to be validated
+        
+        Returns:
+            bool: True if all colors are valid, False otherwise
+        """
+        
+        return all(QRCode.validate_color(color) for color in colors)
+
+    async def generate_qrcode(data, filename: str, scale: int = 1, color_background="white", color_data="black", color_outline=None, image: str = None, icon: Image.Image = None, margin: int = 7) -> str:
+        """
+        Generates a QR code
+
+        Supported colors:
+            CSS color codes
+            RGB as tuple
+            Hexadecimal (6 char and 8 char)
+
+        Args:
+            data: The contained data
+            filename (str): The filename of the generated QR code
+            scale (int): The size of each module in pixels
+            color_background: The color of the background
+            color_data: The color of the modules
+            color_outline: The color of the quiet zone
+            image: The background image / gif
+            icon: The icon (do not use with image)
+            margin: The margin in pixels around the icon background
+        Returns:
+            filepath (str): The path to the generated image file
+        """
+        if image and icon:
+            raise ValueError("Error during generate_qrcode: Image and Icon can't be used simultaneously")
+
+        if str(image).endswith(".gif"):
+            extension = "gif"
+        else:
+            extension = "png"
+
+        filepath = os.path.join(config.Paths.data_folder, "Generated QRCodes", f"{filename}.{extension}")
+
+        if image:
+            qr = segno.make(data, error="h")
+            qr.to_artistic(background=image, target=filepath, scale=scale)
+        else:
+            if not color_outline:
+                color_outline = color_background
+
+            qr = segno.make(data, error="h")
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
+                tmp_filepath = tmp_file.name
+                qr.save(tmp_filepath, scale=scale, border=2, light=color_background, dark=color_data, quiet_zone=color_outline)
+
+            qr_img = Image.open(tmp_filepath).convert("RGBA")
+
+            if icon:
+                icon_size = qr_img.size[0] // 4  # Set the icon size relative to the QR code size
+                icon_img = icon.copy().convert("RGBA")
+                icon_img.thumbnail((icon_size, icon_size))
+                
+                # Calculate the size of the background with the margin
+                bg_size = (icon_img.width + 2 * margin, icon_img.height + 2 * margin)
+                background = Image.new("RGBA", bg_size, color_background)
+                
+                # Create a new image that will serve as the overlay with a transparent background
+                overlay = Image.new("RGBA", qr_img.size, (255, 255, 255, 0))
+                
+                # Calculate the position of the background with margin
+                bg_position = ((qr_img.size[0] - bg_size[0]) // 2, (qr_img.size[1] - bg_size[1]) // 2)
+                icon_position = (bg_position[0] + margin, bg_position[1] + margin)
+                
+                # Paste the solid color background onto the overlay at the icon position
+                overlay.paste(background, bg_position)
+                
+                # Composite the overlay with the QR code image
+                qr_img = Image.alpha_composite(qr_img, overlay)
+                
+                # Paste the icon on top of the modified QR code image
+                qr_img.paste(icon_img, icon_position, icon_img)
+
+            qr_img.save(filepath)
+            os.remove(tmp_filepath)
+
+        return filepath

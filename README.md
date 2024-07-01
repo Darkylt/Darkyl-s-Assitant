@@ -68,6 +68,7 @@ Here are some of the commands supported by Darkyl's Assistant:
 -  **/fakeban:** Do some trolling by fake banning someone
 -  **/fakekick:** Do some trolling by fake kicking someone
 -  **/flood_of_pings:** Ping specified user number of times
+-  **/qrcode:** Generate a QR Code
 
 ## Support
 

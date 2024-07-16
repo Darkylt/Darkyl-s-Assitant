@@ -92,8 +92,6 @@ async def clear_warnings_command(ctx: lightbulb.SlashContext):
         Responds
     """
 
-
-
     if not await utils.validate_command(ctx):
         return
 
@@ -119,12 +117,71 @@ async def clear_warnings_command(ctx: lightbulb.SlashContext):
         # Remove the user's entry from the data dictionary if it exists
         if user_id in data:
             del data[user_id]
+        else:
+            await ctx.respond(f"{user.mention} has no warnings.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
 
         # Write the updated data back to the JSON file
         with open(database_path, "w") as file:
             json.dump(data, file, indent=4)
 
         await ctx.respond(f"Successfully removed all warnings for {user.username}", flags=hikari.MessageFlag.EPHEMERAL)
+        from bot import Logging
+        await Logging.log_message(f"User <@{user_id}> has had all their warnings removed.")
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An error occurred while clearing warnings: {e}")
+        await ctx.respond(f"An error occurred!{await utils.error_fun()}", flags=hikari.MessageFlag.EPHEMERAL)
+
+@plugin.command
+@lightbulb.add_cooldown(3, 3, lightbulb.UserBucket)
+@lightbulb.app_command_permissions(hikari.Permissions.BAN_MEMBERS, dm_enabled=False)
+@lightbulb.option("user", "The user that should have their warning cleared", type=int)
+@lightbulb.command("clear_warnings_by_id", "Remove all warnings of someone with their ID")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def clear_warnings_command(ctx: lightbulb.SlashContext):
+    """
+    A command to clear all warnings of a user.
+
+    Processing:
+        It fetches the provided user
+        Reads the existing entries
+        Deletes all warnings
+        Writes the updated file
+        Responds
+    """
+
+    if not await utils.validate_command(ctx):
+        return
+    
+    user_id = str(ctx.options.user)
+
+    try:
+
+        # Load existing data from the JSON file
+        database_path = os.path.join(config.Paths.data_folder, "Database", "warnings.json")
+        if os.path.exists(database_path) and os.path.getsize(database_path) > 0:
+            with open(database_path, "r") as file:
+                try:
+                    data = json.load(file)
+                except json.JSONDecodeError:
+                    data = {}
+        else:
+            # No data in the file
+            data = {}
+
+        # Remove the user's entry from the data dictionary if it exists
+        if user_id in data:
+            del data[user_id]
+        else:
+            await ctx.respond(f"The user '{user_id}' has no warnings.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+        # Write the updated data back to the JSON file
+        with open(database_path, "w") as file:
+            json.dump(data, file, indent=4)
+
+        await ctx.respond(f"Successfully removed all warnings for '{user_id}'", flags=hikari.MessageFlag.EPHEMERAL)
         from bot import Logging
         await Logging.log_message(f"User <@{user_id}> has had all their warnings removed.")
     except Exception as e:

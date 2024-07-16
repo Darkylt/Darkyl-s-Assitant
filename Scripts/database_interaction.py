@@ -190,3 +190,32 @@ def update_nsfw_status(user_id: int, nsfw_opt_out: bool) -> bool:
         from bot import logger
         logger.error(f"An unexpected error occurred while updating nsfw status in the database: {e}")
     return False
+
+def delete_user_entry(user_id: int) -> bool:
+    """
+    A function to delete a user entry from the database
+
+    Args:
+        user_id (int): The ID of the user you want to delete
+
+    Returns:
+        bool: True if the user was successfully deleted, False otherwise
+    """
+    try:
+        connection = get_database_connection()
+        if connection:
+            with connection:
+                cursor = connection.cursor()
+                cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+                connection.commit()
+                return cursor.rowcount > 0
+    except sqlite3.OperationalError as e:
+        from bot import logger
+        logger.error(f"Operational error while deleting user entry: {e}")
+    except sqlite3.Error as e:
+        from bot import logger
+        logger.error(f"SQLite error while deleting user entry: {e}")
+    except Exception as e:
+        from bot import logger
+        logger.error(f"An unexpected error occurred while deleting user entry: {e}")
+    return False

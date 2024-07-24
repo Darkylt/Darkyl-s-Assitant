@@ -1,10 +1,13 @@
 import json
 import os
+from datetime import datetime, timezone
 
 import bot_utils as utils
 import buttons
 import config_reader as config
 import database_interaction
+import dateutil
+import dateutil.parser
 import hikari
 import hikari.errors
 import image_manager
@@ -55,7 +58,8 @@ async def mod_menu_command(ctx: lightbulb.SlashContext, user: hikari.User):
 
     embed.add_field("**• Nickname:**", value=f"{user.display_name or '-'}")
     embed.add_field("**• User ID:**", value=f"{user.id}")
-    embed.add_field("**• Bot:**", value=f"'{user.is_bot}'")
+    if user.is_bot:
+        embed.add_field("**• Bot:**", value=f"'The user is a bot.'")
     embed.add_field(
         "**• Account create date:**",
         value=f"{utils.format_dt(user.created_at)} ({utils.format_dt(user.created_at, style='R')})",
@@ -70,7 +74,7 @@ async def mod_menu_command(ctx: lightbulb.SlashContext, user: hikari.User):
         value=f"Until: {utils.format_dt(user.communication_disabled_until()) if user.communication_disabled_until() is not None else '-'}",
     )
 
-    stats = database_interaction.get_user_entry(user_id=user.id)
+    stats = database_interaction.Users.get_user_entry(user_id=user.id)
 
     if stats:
         (id, msg_count, xp, level, cmds_used, reported, been_reported, nsfw_opt_out) = (
@@ -143,9 +147,94 @@ async def mod_menu_command(ctx: lightbulb.SlashContext, user: hikari.User):
     if banner is not None:
         embed.set_image(user.banner_url)
 
+    embeds = [embed]
+
+    all_messages = database_interaction.Messages.get_messages_by_author(user.id)
+
+    if all_messages is not None:
+
+        msg_info_embed = hikari.Embed(
+            title="Messages",
+            description="The following embeds are the last 5 messages sent by the user.\n\nIf the messages have been edited to obstruct vital information you can use `/message_history` to see older versions of the message. The message ID should be at the very bottom of the embed. Note: Messages can only be picked up while the bot is running and if the bot can see them. Some information might be incomplete.",
+            color="ff0000",
+        )
+
+        embeds.append(msg_info_embed)
+
+        # Create a dictionary to keep track of the message with the highest edited count for each msg_id
+        message_dict = {}
+
+        for message in all_messages:
+            msg_id = message["msg_id"]
+            if (
+                msg_id not in message_dict
+                or message["edited"] > message_dict[msg_id]["edited"]
+            ):
+                message_dict[msg_id] = message
+
+        # Convert dictionary values back to a list
+        filtered_messages = list(message_dict.values())
+
+        # Sort filtered_messages by the 'created_at' field in ascending order
+        filtered_messages.sort(key=lambda m: datetime.fromisoformat(m["created_at"]))
+
+        # Get the bottom 10 messages (or fewer if there aren't that many)
+        bottom_messages = filtered_messages[-5:]
+
+        # Create and send embeds for each of the bottom messages
+        for entry in bottom_messages:
+            formatted_date = utils.iso_8601_to_discord_timestamp(entry["created_at"])
+
+            if entry["edited"] > 0:
+                title = "Message (Edited)"
+            else:
+                title = "Message"
+
+            title = "Message"
+
+            content = str(entry["content"]).replace("`", "'")
+
+            msg_embed = hikari.Embed(
+                title=title,
+                description=f"```{content}```",
+                color=0x0099FF,
+            )
+
+            channel = await plugin.app.rest.fetch_channel(entry["channel_id"])
+
+            msg_embed.add_field(
+                name="Channel:", value=f"{channel.mention}", inline=False
+            )
+            msg_embed.set_author(
+                name=user.username, icon=hikari.files.URL(str(user.avatar_url))
+            )
+            msg_embed.add_field(name="Created at:", value=formatted_date, inline=False)
+            msg_embed.add_field(
+                name="Attachments:", value=str(bool(entry["attachments"]))
+            )
+            msg_embed.set_footer(str(entry["msg_id"]))
+
+            embeds.append(msg_embed)
+
+    commands = database_interaction.Commands.get_commands_by_user(user.id)
+
+    if commands is not None:
+        commands.sort(key=lambda m: datetime.fromisoformat(m["used_at"]))
+
+        bottom_commands = commands[-5:]
+
+        cmd_str = ""
+
+        for cmd_entry in bottom_commands:
+            cmd_str += f"/{cmd_entry['cmd_name']}\n"
+
+        cmd_embed = hikari.Embed(title="Latest commands", description=cmd_str)
+
+        embeds.append(cmd_embed)
+
     view = buttons.ModMenu()
 
-    await ctx.respond(f"{user.mention}", embed=embed, components=view)
+    await ctx.respond(f"{user.mention}", embeds=embeds, components=view)
 
     if banner is not None:
         os.remove(banner)

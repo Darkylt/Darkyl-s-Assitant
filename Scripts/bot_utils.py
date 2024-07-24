@@ -99,7 +99,7 @@ async def validate_command(
     Processing:
         1: Checks if the command executor is a real user
         2: If nsfw, performs checks to validate the usage of the command
-        3: Adds the new info to the user statistics
+        3: Adds the new info to the database
     """
 
     from bot import logger
@@ -113,7 +113,7 @@ async def validate_command(
             )
             return False
 
-        if nsfw:
+        if nsfw or ctx.command.nsfw:
             try:
                 # Check if it's an nsfw channel
                 channel = await ctx.app.rest.fetch_channel(ctx.channel_id)
@@ -151,33 +151,60 @@ async def validate_command(
                 )
                 return False
 
-        if message_command:
-            logger.info(
-                f"{ctx.author.username}({ctx.author.id}) used {ctx.command.name} command"
-            )
-        else:
-            logger.info(
-                f"{ctx.author.username}({ctx.author.id}) executed /{ctx.command.name}"
-            )
+        # if message_command:
+        #    logger.info(
+        #        f"{ctx.author.username}({ctx.author.id}) used {ctx.command.name} command"
+        #    )
+        # else:
+        #    logger.info(
+        #        f"{ctx.author.username}({ctx.author.id}) executed /{ctx.command.name}"
+        #    )
 
-        # Update stats
-        try:
-            id = ctx.author.id.real
+        if ctx.guild_id == config.Bot.server:
+            # Updating stats
+            try:
+                id = ctx.author.id.real
 
-            await member_managment.update_user_stats(
-                user_id=int(id),
-                msg=False,
-                cmd=True,
-                rep=report,
-                extra_xp=extra_xp,
-            )
-        except Exception as e:
-            logger.error(f"An error occurred while updating the user stats: {e}")
-            await ctx.respond(
-                "An error occurred while updating the user stats.",
-                flags=hikari.MessageFlag.EPHEMERAL,
-            )
-            return False
+                await member_managment.update_user_stats(
+                    user_id=int(id),
+                    msg=False,
+                    cmd=True,
+                    rep=report,
+                    extra_xp=extra_xp,
+                )
+            except Exception as e:
+                logger.error(f"An error occurred while updating the user stats: {e}")
+                await ctx.respond(
+                    "An error occurred while updating the user stats.",
+                    flags=hikari.MessageFlag.EPHEMERAL,
+                )
+                return False
+
+            # Logging the command
+            options = ctx.raw_options
+
+            if options:
+                result = []
+
+                for key, value in options.items():
+                    if isinstance(value, (hikari.Role, hikari.InteractionChannel)):
+                        result.append(f"{key}({value.name})")
+                    elif isinstance(value, hikari.InteractionMember):
+                        result.append(f"{key}({value.user.username})")
+                    elif isinstance(value, hikari.Attachment):
+                        result.append(f"{key}({value.filename})")
+                    elif isinstance(value, (bool, str, int, float)):
+                        result.append(f"{key}({value})")
+
+                options_str = ", ".join(result)
+
+            else:
+                options_str = "No options."
+
+            if not nsfw or ctx.command.nsfw:
+                database_interaction.Commands.create_command_entry(
+                    ctx.author.id, ctx.command.name, options_str
+                )
 
         return True
     except Exception as e:
@@ -561,7 +588,15 @@ def format_dt(time: datetime.datetime, style: str | None = None) -> str:
 
     For styling see this link: https://discord.com/developers/docs/reference#message-formatting-timestamp-styles.
     """
-    valid_styles = ["t", "T", "d", "D", "f", "F", "R"]
+    valid_styles = [
+        "t",  # Short time (e.g 09:01)
+        "T",  # Long time (e.g 09:01:00)
+        "d",  # Short Date (e.g 28/11/2018)
+        "D",  # Long Date (e.g 28 November 2018)
+        "f",  # Short Date/Time (e.g 28 November 2018 09:01)
+        "F",  # Long Date/Time (e.g Wednesday, 28 November 2018 09:01)
+        "R",  # Relative Time (e.g 3 years ago)
+    ]
 
     if style and style not in valid_styles:
         raise ValueError(
@@ -574,20 +609,35 @@ def format_dt(time: datetime.datetime, style: str | None = None) -> str:
     return f"<t:{int(time.timestamp())}>"
 
 
+def iso_8601_to_discord_timestamp(time: str) -> str:
+    created_at = datetime.datetime.fromisoformat(time)
+
+    # Assume the datetime is in UTC and make it timezone-aware
+    created_at = created_at.replace(tzinfo=datetime.timezone.utc)
+
+    # Convert to Unix timestamp
+    unix_timestamp = int(created_at.timestamp())
+
+    # Format as Discord timestamp
+    formatted_date = f"<t:{unix_timestamp}>"
+
+    return formatted_date
+
+
 BADGE_MAPPING = {
-    hikari.UserFlag.BUG_HUNTER_LEVEL_1: "`Bug Hunter`",
-    hikari.UserFlag.BUG_HUNTER_LEVEL_2: "`Bug Hunter Gold`",
-    hikari.UserFlag.DISCORD_CERTIFIED_MODERATOR: "`Official Discord Moderator`",
-    hikari.UserFlag.EARLY_SUPPORTER: "`Early Supporter`",
-    hikari.UserFlag.EARLY_VERIFIED_DEVELOPER: "`Early verified developer`",
-    hikari.UserFlag.HYPESQUAD_EVENTS: "`Hypesquad Events`",
-    hikari.UserFlag.HYPESQUAD_BALANCE: "`Hypesquad Balance`",
-    hikari.UserFlag.HYPESQUAD_BRAVERY: "`Hypesquad Bravery`",
-    hikari.UserFlag.HYPESQUAD_BRILLIANCE: "`Hypesquad Brilliance`",
-    hikari.UserFlag.PARTNERED_SERVER_OWNER: "`Discord Partner`",
-    hikari.UserFlag.DISCORD_EMPLOYEE: "`Discord Employee`",
-    hikari.UserFlag.ACTIVE_DEVELOPER: "`Active Developer`",
-    hikari.UserFlag.VERIFIED_BOT: "`Verified Bot`",
+    hikari.UserFlag.BUG_HUNTER_LEVEL_1: "<:badge_bug_hunter_level_1:1265030107639316672>",
+    hikari.UserFlag.BUG_HUNTER_LEVEL_2: "<:badge_bug_hunter_level_2:1265030128145272925>",
+    hikari.UserFlag.DISCORD_CERTIFIED_MODERATOR: "<:badge_certified_moderator:1265030135912857641>",
+    hikari.UserFlag.EARLY_SUPPORTER: "<:badge_early_supporter:1265030144431489155>",
+    hikari.UserFlag.EARLY_VERIFIED_DEVELOPER: "<:badge_early_verified_developer:1265032683143303250>`",
+    hikari.UserFlag.HYPESQUAD_EVENTS: "<:badge_hype_squad_events:1265030182117314613>",
+    hikari.UserFlag.HYPESQUAD_BALANCE: "<:badge_hype_squad_balance:1265030157249544274>",
+    hikari.UserFlag.HYPESQUAD_BRAVERY: "<:badge_hype_squad_bravery:1265030166493663242>",
+    hikari.UserFlag.HYPESQUAD_BRILLIANCE: "<:badge_hype_squad_brilliance:1265030174240673864>",
+    hikari.UserFlag.PARTNERED_SERVER_OWNER: "<badge_partner:1265030191928049741>",
+    hikari.UserFlag.DISCORD_EMPLOYEE: "<:badge_staff:1265030200127918100>",
+    hikari.UserFlag.ACTIVE_DEVELOPER: "<:badge_verified_developer:1265030206494740530>",
+    hikari.UserFlag.VERIFIED_BOT: "<:badge_verified_bot:1265031791853699203>",
 }
 
 
@@ -623,7 +673,7 @@ async def nsfw_blacklisted(user_id: int) -> bool:
         False: User isn't blacklisted
     """
 
-    entry = database_interaction.get_user_entry(user_id, values=["nsfw_opt_out"])
+    entry = database_interaction.Users.get_user_entry(user_id, values=["nsfw_opt_out"])
 
     nsfw_opt_out = bool(entry[0])
 

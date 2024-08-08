@@ -62,8 +62,8 @@ async def handle_join(event: hikari.MemberCreateEvent):
 
         await update_captcha_status()
 
-        # if not raid:
-        #    await member_managment.new_member(event.member, plugin.bot)
+        if not raid:
+           await member_managment.new_member(event.member, plugin.bot)
 
     except Exception as e:
         from bot import logger
